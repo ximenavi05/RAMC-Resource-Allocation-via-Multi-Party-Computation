@@ -2,8 +2,8 @@ from Compiler.types import sint
 from Compiler.library import print_ln_to
 
 T = 10
-N = 6
-NUM_SKILLS = 6
+N = 4
+NUM_SKILLS = 4
 
 # ----------------------------
 # Helpers sobre valores secretos
