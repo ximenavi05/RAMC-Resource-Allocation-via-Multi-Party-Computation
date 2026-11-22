@@ -1,772 +1,1354 @@
 <!doctype html>
 <html lang="es">
 <head>
-    <meta charset="utf-8">
-    <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Surplus · Encuentra tu mejor aliado</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg: #f3f4fb;
-            --surface: #ffffff;
-            --surface-2: #f3f4fb;
-            --border: #e5e6f2;
-            --text: #171933;
-            --muted: #6b7088;
-            --accent: #5b5bd6;
-            --accent-2: #14a38b;
-            --accent-soft: #eef0fd;
-            --danger: #d64545;
-            --sidebar-bg: #12142a;
-            --sidebar-text: #c9cbe0;
-            --sidebar-active: #5b5bd6;
-            --shadow: 0 1px 2px rgba(23, 25, 51, 0.04), 0 10px 28px rgba(23, 25, 51, 0.06);
-        }
-        * { box-sizing: border-box; }
-        body {
-            margin: 0;
-            min-height: 100vh;
-            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-            color: var(--text);
-            background: var(--bg);
-            -webkit-font-smoothing: antialiased;
-        }
-        .app { display: flex; min-height: 100vh; }
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#151a38">
+  <title>RAMC· Encuentra tu mejor aliado</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    /* ============================================================
+       RAMC / ATLAS — AESTHETIC UI
+       Solo presentación: el protocolo, la sala, el número de
+       participantes y la ejecución de atlas-party.js se conservan.
+       ============================================================ */
+    :root {
+      --bg: #f8f6ff;
+      --surface: #ffffff;
+      --surface-2: #f7f4ff;
+      --ink: #171b40;
+      --muted: #777b9b;
+      --border: #e8e3f4;
+      --purple: #6753d9;
+      --purple-dark: #5436bc;
+      --purple-light: #b48bfa;
+      --purple-soft: #f0e9ff;
+      --teal: #0c9d86;
+      --teal-soft: #e6f8f3;
+      --danger: #be475d;
+      --sidebar: #171d3e;
+      --shadow: 0 10px 34px rgba(48, 40, 113, .055), 0 2px 9px rgba(48, 40, 113, .028);
+      --radius: 24px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "DM Sans", "Inter", system-ui, -apple-system, sans-serif;
+      font-size: 14px;
+      -webkit-font-smoothing: antialiased;
+    }
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+    button:disabled { cursor: not-allowed; }
+    button:focus-visible, a:focus-visible, select:focus-visible, input:focus-visible, summary:focus-visible {
+      outline: 3px solid #bca7fa;
+      outline-offset: 3px;
+    }
+    [hidden] { display: none !important; }
+    .app { display: flex; min-height: 100vh; }
 
-        /* ---------- Sidebar ---------- */
-        .sidebar {
-            width: 240px; flex: none;
-            background: var(--sidebar-bg); color: var(--sidebar-text);
-            display: flex; flex-direction: column;
-            padding: 22px 16px;
-        }
-        .brand { display: flex; align-items: center; gap: 10px; padding: 0 6px 22px; }
-        .brand-mark {
-            width: 36px; height: 36px; border-radius: 10px;
-            display: grid; place-items: center;
-            background: linear-gradient(135deg, var(--accent), var(--accent-2));
-            color: #fff; flex: none;
-        }
-        .brand-name { font-weight: 800; font-size: 17px; color: #fff; letter-spacing: -.2px; }
-        .brand-sub { font-size: 10.5px; color: #8c8fb5; }
-        nav.nav { display: flex; flex-direction: column; gap: 4px; margin-bottom: 20px; }
-        .nav-item {
-            display: flex; align-items: center; gap: 11px;
-            padding: 10px 12px; border-radius: 12px;
-            color: var(--sidebar-text); cursor: pointer; user-select: none;
-            font-size: 13.5px; font-weight: 600;
-            text-decoration: none;
-        }
-        .nav-item .nav-icon { width: 20px; height: 20px; flex: none; opacity: .85; }
-        .nav-item .nav-hint { display: block; font-size: 10.5px; font-weight: 500; color: #80839f; }
-        .nav-item.active { background: var(--sidebar-active); color: #fff; }
-        .nav-item.active .nav-hint { color: #d9d9ff; }
-        .nav-item.disabled { opacity: .45; cursor: default; }
-        .nav-item.disabled .soon {
-            margin-left: auto; font-size: 9px; font-weight: 700; letter-spacing: .3px;
-            background: rgba(255,255,255,.08); border-radius: 999px; padding: 2px 7px;
-        }
-        .sidebar-globe {
-            flex: 1; min-height: 80px; display: flex; align-items: center; justify-content: center;
-            opacity: .8;
-        }
-        .sidebar-footer { font-size: 11px; color: #9699ba; line-height: 1.5; padding: 0 6px; }
-        .sidebar-footer .tag { font-weight: 700; color: #d7d9f0; }
-        .sidebar-mini-list { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
-        .sidebar-mini-list span { display: flex; align-items: center; gap: 7px; }
-        .sidebar-mini-list i { width: 7px; height: 7px; border-radius: 50%; background: var(--accent-2); flex: none; }
+    /* Sidebar: misma estructura, con dos opciones futuras ocultas. */
+    .sidebar {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      display: flex;
+      flex-direction: column;
+      flex: none;
+      width: 84px;
+      min-width: 84px;
+      height: 100dvh;
+      padding: 17px 12px 22px;
+      overflow: hidden;
+      color: #e2e1f6;
+      background: linear-gradient(165deg, #171e42 0%, #141933 66%, #25204f 100%);
+      border-right: 1px solid rgba(255, 255, 255, .08);
+      transition: width .22s ease, min-width .22s ease;
+    }
+    .sidebar.expanded { width: 244px; min-width: 244px; }
+    .sidebar-toggle {
+      display: grid;
+      place-items: center;
+      width: 54px;
+      height: 52px;
+      margin: 0 auto 19px;
+      padding: 0;
+      flex: none;
+      color: #f7f4ff;
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 16px;
+      background: rgba(255,255,255,.045);
+      transition: background .2s ease;
+    }
+    .sidebar-toggle:hover { background: rgba(255,255,255,.14); }
+    .sidebar.expanded .sidebar-toggle { margin-left: 2px; }
+    .brand { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 25px; }
+    .brand-mark {
+      width: 52px; height: 52px; display: grid; place-items: center; flex: none;
+      border-radius: 16px; color: white;
+      background: linear-gradient(135deg,#6b67ee 0%,#8069df 52%,#32b9b3 100%);
+      box-shadow: 0 10px 22px rgba(76, 67, 201, .18);
+    }
+    .brand-copy, .sidebar-footer { display: none; }
+    .sidebar.expanded .brand { justify-content: flex-start; padding: 0 3px; }
+    .sidebar.expanded .brand-copy { display: block; min-width: 0; }
+    .brand-name { font: 800 16px/1.2 Manrope, sans-serif; letter-spacing: -.45px; color:#fff; }
+    .brand-sub { font-size: 10px; color: #adb0da; padding-top: 4px; }
+    .nav { display: flex; flex-direction: column; gap: 10px; }
+    .nav-item {
+      display: flex; align-items: center; justify-content: center; gap: 14px;
+      min-height: 56px; padding: 12px 14px; border-radius: 16px;
+      text-decoration: none; color: #b7b9d9; transition: background .2s ease, color .2s ease;
+    }
+    .nav-item:hover { color: #fff; background: rgba(255,255,255,.075); }
+    .nav-item.active {
+      color: #fff;
+      background: linear-gradient(135deg, #6e5be2, #8a63e9);
+      box-shadow: 0 7px 20px rgba(110, 91, 226, .22);
+    }
+    .nav-icon { width: 24px; height: 24px; flex: none; }
+    .nav-copy { display: none; min-width: 0; }
+    .nav-title { font-weight: 700; font-size: 13px; }
+    .nav-hint { margin-top: 3px; color: #a7a9cd; font-size: 10px; font-weight: 500; }
+    .active .nav-hint { color: #ebe5ff; }
+    .sidebar.expanded .nav-item { justify-content: flex-start; }
+    .sidebar.expanded .nav-copy { display: block; }
+    .sidebar-spacer { flex: 1; min-height: 36px; }
+    .sidebar-deco { opacity: .56; display: grid; place-items: center; }
+    .sidebar-deco svg { width: 62px; height: 62px; }
+    .sidebar.expanded .sidebar-deco svg { width: 100px; height: 100px; }
+    .sidebar.expanded .sidebar-footer { display:block; margin-top: 14px; color:#abaed5; font-size:11px; line-height:1.6; padding:0 8px; }
 
-        /* ---------- Main ---------- */
-        .main { flex: 1; min-width: 0; padding: 26px 32px 40px; }
-        .topbar { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 22px; flex-wrap: wrap; }
-        .topbar h1 { margin: 0 0 4px; font-size: 25px; font-weight: 800; letter-spacing: -.3px; }
-        .topbar p { margin: 0; color: var(--muted); font-size: 13.5px; max-width: 560px; }
-        .top-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-        .pill {
-            display: flex; align-items: center; gap: 8px;
-            background: var(--surface); border: 1px solid var(--border); border-radius: 999px;
-            padding: 8px 14px; font-size: 12.5px; font-weight: 600; box-shadow: var(--shadow);
-        }
-        select.country-select {
-            appearance: none; border: none; background: transparent; font: inherit; font-weight: 700;
-            color: var(--text); cursor: pointer;
-        }
-        .secure-pill { color: var(--accent-2); }
-        .secure-pill small { display: block; font-weight: 500; color: var(--muted); font-size: 10px; }
+    /* Main + quiet violet background */
+    .main {
+      flex: 1;
+      min-width: 0;
+      max-width: 1900px;
+      margin: 0 auto;
+      padding: 0 clamp(22px, 3.2vw, 54px) 56px;
+      position: relative;
+      isolation: isolate;
+    }
+    .main::before {
+      content:"";
+      position:absolute;
+      z-index:-2;
+      inset:0 0 auto 0;
+      height: 440px;
+      pointer-events:none;
+      background:
+        radial-gradient(ellipse 36% 68% at 67% 0%, rgba(145, 126, 240, .24), transparent 74%),
+        radial-gradient(ellipse 45% 85% at 96% 16%, rgba(225, 206, 252, .68), transparent 78%),
+        linear-gradient(180deg, #f7f5ff 0%, rgba(247,245,255,.7) 78%, rgba(247,245,255,0));
+    }
+    .topbar { min-height: 209px; display: flex; align-items: center; position: relative; gap: 18px; padding: 32px 0 29px; }
+    .intro { position: relative; z-index: 2; max-width: 720px; }
+    .eyebrow {
+      width: max-content; display: inline-flex; align-items:center; gap: 9px;
+      padding: 8px 13px; margin-bottom: 17px; border:1px solid #e3d9ff;
+      border-radius: 999px; background: rgba(239, 232, 255, .72);
+      color: #5a39bb; font-size: 11px; font-weight: 800; letter-spacing:.15px;
+    }
+    .eyebrow svg {flex:none;}
+    .topbar h1 { font: 800 clamp(30px, 3vw, 44px)/1.18 Manrope, sans-serif; letter-spacing: -1.9px; margin: 0 0 12px; }
+    .topbar h1 .highlight {
+      color: #7043d5;
+      background: linear-gradient(115deg, #ae63ef, #5935bf);
+      -webkit-background-clip: text; background-clip:text; -webkit-text-fill-color: transparent;
+    }
+    .topbar p { margin: 0; max-width: 630px; font-size: 14px; line-height:1.7; color: #616788; }
+    .top-right { display:flex; align-items:center; flex-wrap:wrap; gap:10px; position:relative; z-index:3; margin-left:auto; align-self:flex-start; margin-top:19px; }
+    .pill {
+      display:flex; align-items:center; gap:8px; min-height:43px;
+      padding: 8px 13px; border: 1px solid rgba(222, 218, 242, .9);
+      border-radius: 999px; background: rgba(255,255,255,.82);
+      box-shadow: 0 4px 16px rgba(79,65,150,.055);
+      backdrop-filter: blur(14px); font-size: 12px; font-weight: 700;
+      white-space:nowrap;
+    }
+    .pill svg, .pill .my-flag { flex:none; }
+    #my-seat-label {white-space:nowrap; font-weight: 800; color:#5d4bad;}
+    .country-select {
+      appearance: none; border:0; outline:0; background:transparent; color:var(--ink);
+      font-size: 12px; font-weight:700; width:105px; max-width:175px; min-width:0;
+      cursor:pointer;
+    }
+    .country-select:focus-visible { outline:2px solid #ae98ec; outline-offset:3px; }
+    .select-chevron { width:13px; opacity:.6; }
+    .secure-pill { color:#087f70; background:#edf9f5; border-color:#d1ece5; }
+    .secure-pill small {display:block; font-size:10px; font-weight:500; color:#678783; margin-top:2px;}
+    .secure-pill.is-offline { color:#856579; background:#f7eff5; border-color:#eedde9; }
+    .hero-globe {
+      position:absolute; z-index:-1; width:360px; height:210px; top:-17px; left:48%;
+      opacity:.48; pointer-events:none; overflow:hidden;
+      filter:drop-shadow(0 0 15px rgba(121,100,218,.16));
+    }
+    .hero-globe svg {width:100%;height:100%;}
 
-        /* ---------- Cards ---------- */
-        .card {
-            background: var(--surface); border: 1px solid var(--border); border-radius: 18px;
-            box-shadow: var(--shadow); overflow: hidden; margin-bottom: 18px;
-        }
-        .card-pad { padding: 20px 22px; }
-        .card-title { display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 700; margin-bottom: 4px; }
-        .step-num {
-            width: 24px; height: 24px; border-radius: 50%; flex: none;
-            background: var(--accent); color: #fff; font-size: 12px; font-weight: 700;
-            display: grid; place-items: center;
-        }
-        .card-sub { color: var(--muted); font-size: 12.5px; margin: 0 0 16px; }
+    /* Common surfaces */
+    .columns {display:grid; grid-template-columns:minmax(0,1.46fr) minmax(345px,.94fr); align-items:start; gap:20px;}
+    .left-stack, .right-stack { min-width:0; display:flex; flex-direction:column; gap:18px; }
+    .card {
+      min-width:0; overflow:hidden; border:1px solid rgba(230,224,247,.94);
+      background:rgba(255,255,255,.88); border-radius:var(--radius);
+      box-shadow:var(--shadow); backdrop-filter:blur(12px);
+    }
+    .card-pad {padding:clamp(20px, 2.5vw, 33px);}
+    .card-heading {display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:8px;}
+    .card-title {display:flex; align-items:center; gap:12px; font:800 17px/1.4 Manrope,sans-serif; letter-spacing:-.5px; margin:0;}
+    .step-num {width:33px;height:33px;border-radius:12px;display:grid;place-items:center;flex:none;color:#fff;background:linear-gradient(145deg,#8464ea,#6449d7);font:800 13px Manrope,sans-serif; box-shadow:0 5px 13px rgba(104,75,215,.16);}
+    .ideal-badge {display:inline-flex;align-items:center;gap:7px;padding:8px 12px;border-radius:999px;border:1px solid #e5d8ff;background:#f4edff;color:#6240c2;font-size:12px;font-weight:800;white-space:nowrap;}
+    .card-sub {margin:0 0 13px; color:var(--muted); font-size:12px; line-height:1.7;}
+    .error-box {margin:0 0 18px;padding:13px 17px;border:1px solid #edb8c4;background:#fff3f5;color:#aa3653;border-radius:15px;font-size:12px;display:none;line-height:1.5;}
+    .error-box.show {display:block;}
 
-        .columns { display: grid; grid-template-columns: 1.5fr 1fr; gap: 20px; align-items: start; }
-        @media (max-width: 980px) { .columns { grid-template-columns: 1fr; } }
+    /* Skills: clear, airy controls with visible ideal threshold */
+    .skill-row {display:grid;grid-template-columns:49px minmax(160px,.9fr) minmax(160px,1.25fr) 68px;gap:14px;align-items:center;padding:19px 0;border-bottom:1px solid #f0ebf7;}
+    .skill-row:last-child {border-bottom:0;}
+    .skill-icon {width:48px;height:48px;display:grid;place-items:center;border-radius:15px;background:var(--skill-soft);color:var(--skill-color);}
+    .skill-icon svg {width:22px;height:22px;stroke:currentColor;}
+    .skill-name {font:800 13px/1.5 Manrope,sans-serif;letter-spacing:-.12px;}
+    .skill-desc {color:var(--muted);font-size:11px;line-height:1.55;margin-top:3px;max-width:215px;}
+    .skill-slider-row {display:flex;align-items:center;gap:0;min-width:0;}
+    .slider-wrap {min-width:0;width:100%;position:relative;}
+    .skill-slider-row input[type="range"] {
+      display:block; width:100%; height:8px; margin: 12px 0 8px;
+      border:0; border-radius:99px; background:linear-gradient(to right, #aa7bf2 0%, #7253e0 var(--progress,50%), #d9d6e7 var(--progress,50%), #d9d6e7 100%);
+      -webkit-appearance:none; appearance:none; outline:0; cursor:pointer;
+    }
+    .skill-slider-row input[type="range"]::-webkit-slider-thumb { -webkit-appearance:none; appearance:none; width:19px;height:19px; border-radius:50%; border:3px solid #7958e5; background:#fff;box-shadow:0 2px 8px rgba(95,63,183,.2);transition:transform .15s;}
+    .skill-slider-row input[type="range"]::-moz-range-thumb { width:15px;height:15px; border-radius:50%; border:3px solid #7958e5; background:#fff;box-shadow:0 2px 8px rgba(95,63,183,.2); }
+    .skill-slider-row input[type="range"]:hover::-webkit-slider-thumb {transform:scale(1.12);}
+    .skill-slider-row input[type="range"]:disabled {opacity:.56;cursor:not-allowed;}
+    .slider-ruler {display:flex;justify-content:space-between;align-items:center;color:#888ba9;font-size:10px;font-weight:700;}
+    .slider-ruler .ideal {color:#7651d7;}
+    .skill-num {width:66px; height:41px; text-align:center; color:var(--ink);font-size:13px;font-weight:800; border:1px solid #e4def0;border-radius:11px;background:#faf8ff;outline:0;}
+    .skill-num:disabled {opacity:.65;}
+    .skill-goal-row {display:flex;justify-content:space-between;align-items:center;gap:10px;padding:15px 32px;background:linear-gradient(90deg,#f9f6ff,#f4efff);border-top:1px solid #eee6ff;font-size:11px;color:#7a76a1;}
+    .skill-goal-row b {color:#6747c3;font-size:12px;}
+    .save-card {background:linear-gradient(115deg,rgba(255,255,255,.94),rgba(252,249,255,.94));}
+    .save-card .card-pad {display:grid;grid-template-columns:minmax(0,1fr) minmax(170px,220px);align-items:center;gap:18px;}
+    .save-card .card-title {font-size:15px;}
+    .save-card .card-sub {margin:5px 0 0;}
+    .save-actions {display:flex;flex-direction:column;align-items:stretch;gap:6px;}
+    button.primary {
+      width:100%;min-height:48px;padding:12px 14px;border:0;border-radius:13px;
+      color:white;font-size:12px;font-weight:800;letter-spacing:.05px;
+      background:linear-gradient(110deg,#7957df,#5f49ca);
+      box-shadow:0 8px 16px rgba(100,70,193,.16);transition:transform .18s,box-shadow .18s;
+    }
+    button.primary:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 10px 21px rgba(100,70,193,.22);}
+    button.primary:disabled {opacity:.48;box-shadow:none;}
+    button.primary.is-ready {background:#f3efff;color:#6446c5;border:1px solid #dfd5fc;box-shadow:none;}
+    .hint-line {text-align:center;margin:0;font-size:10px;color:#8582a2;line-height:1.5;}
 
-        /* ---------- Skill sliders ---------- */
-        .skill-row { display: flex; align-items: center; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--border); }
-        .skill-row:last-child { border-bottom: none; }
-        .skill-icon {
-            width: 42px; height: 42px; border-radius: 12px; flex: none;
-            display: grid; place-items: center; color: #fff;
-        }
-        .skill-body { flex: 1; min-width: 0; }
-        .skill-name { font-weight: 700; font-size: 13.5px; }
-        .skill-desc { font-size: 11.5px; color: var(--muted); margin-top: 1px; }
-        .skill-slider-row { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
-        .skill-slider-row input[type=range] {
-            flex: 1; accent-color: var(--accent); height: 6px; cursor: pointer;
-        }
-        .skill-num {
-            width: 62px; flex: none; text-align: center; border: 1px solid var(--border); border-radius: 9px;
-            padding: 6px 4px; font-weight: 700; font-size: 13px; font-family: inherit;
-        }
-        .skill-goal-row {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 12px 22px; background: var(--surface-2); font-size: 12.5px; font-weight: 600; color: var(--muted);
-            border-top: 1px solid var(--border);
-        }
-        .skill-goal-row b { color: var(--text); }
+    /* Right status card */
+    .session-card {padding:25px 24px;}
+    .session-grid {display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:15px;align-items:center;}
+    .session-country {display:flex;gap:12px;align-items:center;min-width:0;}
+    .session-icon {width:43px;height:43px;display:grid;place-items:center;border-radius:14px;background:#f1eaff;flex:none;color:#704bcb;}
+    .my-country-flag {font-size:26px;line-height:1;}
+    .session-label {font-size:10px;color:var(--muted);margin-bottom:5px;}
+    .session-name {font:800 15px/1.4 Manrope,sans-serif;letter-spacing:-.3px;word-break:break-word;}
+    .session-count {padding-left:17px;border-left:1px solid #e8e0f4;}
+    .session-count .count-num {font:800 19px/1.2 Manrope,sans-serif;letter-spacing:-.45px;}
+    .count-num small{font-size:11px;color:var(--muted);font-weight:600;}
+    .count-track {display:flex;gap:4px;margin-top:13px;}
+    .count-track span {height:6px;flex:1;min-width:0;border-radius:999px;background:#dfd9ed;transition:background .2s;}
+    .count-track span.connected {background:linear-gradient(90deg,#8061e5,#b38ff0);}
+    .seats-mini {display:flex;flex-wrap:wrap;gap:7px;margin-top:17px;}
+    .seat-chip {display:inline-flex;align-items:center;gap:6px;padding:6px 8px;border:1px solid #e9e4f3;border-radius:999px;background:#faf8ff;color:#72708e;font-size:10px;font-weight:700;}
+    .seat-chip .flag {font-size:13px;line-height:1;}
+    .seat-chip.me {border-color:#c3a9ff;background:#f1eaff;color:#643ac6;}
 
-        button.primary {
-            appearance: none; border: none; border-radius: 12px; padding: 12px 22px; width: 100%;
-            font-size: 14px; font-weight: 700; cursor: pointer;
-            background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #fff;
-        }
-        button.primary:disabled { opacity: .5; cursor: not-allowed; }
-        button.primary.is-ready { background: var(--surface-2); color: var(--text); border: 1px solid var(--border); }
-        .hint-line { font-size: 11.5px; color: var(--muted); margin-top: 9px; text-align: center; }
+    /* Deep violet privacy panel: tasteful contrast, no cartoon objects */
+    .privacy-card {position:relative;color:#fff;border:1px solid #8c78c9;background:linear-gradient(127deg,#7861ad 0%,#6550a5 52%,#50438f 100%);}
+    .privacy-card::before,.privacy-card::after {content:"";position:absolute;border:1px solid rgba(235,220,255,.17);border-radius:50%;pointer-events:none;}
+    .privacy-card::before {width:260px;height:260px;right:-114px;top:-171px;}
+    .privacy-card::after {width:240px;height:240px;right:-90px;bottom:-195px;}
+    .privacy-body {display:grid;grid-template-columns:minmax(0,1fr) 92px;gap:10px;align-items:center; padding:26px 27px;}
+    .privacy-card h3 {font:800 17px/1.3 Manrope,sans-serif;letter-spacing:-.4px;margin:0 0 17px;}
+    .privacy-points {display:flex;flex-direction:column;gap:13px;}
+    .privacy-point {display:flex;align-items:flex-start;gap:9px;line-height:1.55;font-size:11.5px;color:#f3ebff;}
+    .privacy-tick {width:20px;height:20px;flex:none;border-radius:50%;display:grid;place-items:center;color:#fff;background:rgba(216,197,255,.25);font-size:12px;font-weight:800;margin-top:0;}
+    .privacy-graphic {display:grid;place-items:center;color:#e8d9ff;opacity:.9;}
+    .privacy-graphic svg {width:87px;height:100px;}
 
-        .error-box {
-            border: 1px solid var(--danger); background: rgba(214,69,69,.08); color: var(--danger);
-            border-radius: 10px; padding: 10px 14px; font-size: 12.5px; display: none; margin-bottom: 14px;
-        }
-        .error-box.show { display: block; }
+    /* Right process stepper */
+    .progress-card .card-pad {padding:25px 26px 26px;}
+    .progress-card .card-title {margin-bottom:15px;}
+    .stepper {display:flex;flex-direction:column;}
+    .s-item {display:flex;gap:12px;align-items:flex-start;position:relative;padding:10px 0;}
+    .s-item:not(:last-child)::before {content:"";position:absolute;top:37px;bottom:-8px;left:13px;width:2px;background:#ebe4f6;}
+    .s-dot {position:relative;z-index:1;display:grid;place-items:center;flex:none;width:27px;height:27px;border:1px solid #ddd5ee;border-radius:50%;background:#f5f2fb;color:#8a82a8;font:800 11px Manrope,sans-serif;}
+    .s-item.done .s-dot {background:#159986;border-color:#159986;color:#fff;}
+    .s-item.active .s-dot {color:#fff;background:linear-gradient(135deg,#8460e7,#593cca);border-color:#7456d8;box-shadow:0 3px 11px rgba(117,83,223,.2);}
+    .s-text {flex:1;min-width:0;padding-top:3px;}
+    .s-text b {display:block;font-size:11.5px;font-weight:800;line-height:1.45;}
+    .s-text span {display:block;color:#8983a2;font-size:10.5px;line-height:1.5;margin-top:3px;}
+    .s-item.active .s-text {background:#f2edff;border-radius:13px;padding:10px 12px;margin-top:-8px;}
 
-        /* ---------- Right-column info cards ---------- */
-        .info-card { display: flex; gap: 12px; align-items: flex-start; }
-        .info-icon {
-            width: 34px; height: 34px; border-radius: 10px; flex: none;
-            display: grid; place-items: center; background: var(--accent-soft); color: var(--accent);
-        }
-        .info-card h3 { margin: 0 0 2px; font-size: 13px; font-weight: 700; }
-        .info-card p { margin: 0; font-size: 12px; color: var(--muted); line-height: 1.5; }
-        .my-country-card { display: flex; align-items: center; gap: 12px; }
-        .my-country-flag { font-size: 30px; line-height: 1; }
-        .my-country-card .label { font-size: 11px; color: var(--muted); }
-        .my-country-card .name { font-weight: 700; font-size: 14.5px; }
-        .change-country { margin-left: auto; font-size: 12px; color: var(--accent); font-weight: 700; cursor: pointer; background: none; border: none; font-family: inherit; }
+    /* Result view; IDs are kept for the original protocol. */
+    .result-headline {text-align:center;padding:12px 0;}
+    .result-headline .kicker {font-size:11px;color:var(--muted);margin-bottom:8px;}
+    .result-headline .value {font:800 clamp(34px,4vw,53px)/1.2 Manrope,sans-serif;letter-spacing:-1px;overflow-wrap:anywhere;}
+    .result-headline .value.ok {color:#6445c5;}
+    .result-headline .value.none {color:var(--danger);font-size:26px;}
+    .result-headline .sub {color:var(--muted);font-size:12px;margin-top:9px;line-height:1.6;}
+    .badge-complement {display:inline-flex;margin-left:7px;padding:4px 9px;border-radius:999px;background:#eee7ff;color:#6c42c6;font-size:10px;font-weight:700;vertical-align:middle;}
+    .spinner {width:38px;height:38px;margin:14px auto;border-radius:50%;border:3px solid #eee8fb;border-top-color:var(--purple);animation:spin .9s linear infinite;}
+    @keyframes spin {to{transform:rotate(360deg)}}
+    .relation-board {position:relative;height:370px;overflow:hidden;border:1px solid #e6def6;border-radius:17px;background:radial-gradient(circle at 50% 46%,rgba(163,132,240,.15),transparent 53%),linear-gradient(135deg,#faf8ff,#f3f1fa);}
+    .relation-node {position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:5px;}
+    .relation-node .bubble {width:57px;height:57px;display:grid;place-items:center;background:#fff;border:2px solid #e5daf9;border-radius:50%;font-size:25px;box-shadow:0 8px 18px rgba(73,51,147,.09);}
+    .relation-node.me .bubble {border-color:#7156d8;}
+    .relation-node.match .bubble {border-color:#1aa692;box-shadow:0 0 0 5px rgba(26,166,146,.1);}
+    .relation-node .node-label {padding:3px 8px;border-radius:999px;border:1px solid #e9e1f7;background:#fff;font-size:10px;font-weight:800;white-space:nowrap;}
+    .relation-line {position:absolute;pointer-events:none;}
+    .recap-grid {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:15px;}
+    .recap-cell {padding:14px 7px;text-align:center;background:#f7f3ff;border:1px solid #e9e0fb;border-radius:13px;}
+    .recap-cell .v {font:800 22px Manrope,sans-serif;color:#6244c1;}
+    .recap-cell .l {color:var(--muted);font-size:10px;margin-top:3px;}
+    .meaning-list {display:flex;flex-direction:column;gap:15px;margin-top:12px;}
+    .meaning-item {display:flex;align-items:flex-start;gap:12px;}
+    .info-icon {display:grid;place-items:center;flex:none;width:34px;height:34px;border-radius:11px;background:#f0e9ff;color:#7654d4;}
+    .meaning-item h4 {margin:0 0 3px;font-size:12px;font-weight:800;}
+    .meaning-item p {margin:0;color:var(--muted);font-size:11px;line-height:1.6;}
+    details.tech {margin-top:16px;padding:13px 20px;color:var(--muted);font-size:12px;border-radius:16px;border:1px solid var(--border);background:#fff;}
+    details.tech summary {cursor:pointer;font-weight:800;}
+    #status {font-size:11px;margin-top:10px;}
+    #output {display:block;width:100%;height:180px;margin-top:10px;padding:13px 14px;border:none;border-radius:12px;resize:vertical;background:#151831;color:#dad8f6;font:11px/1.5 "JetBrains Mono",ui-monospace,monospace;}
 
-        .stepper { display: flex; flex-direction: column; gap: 0; }
-        .stepper .s-item { display: flex; gap: 12px; padding: 10px 0; position: relative; }
-        .stepper .s-item:not(:last-child)::before {
-            content: ""; position: absolute; left: 12px; top: 34px; bottom: -4px; width: 2px; background: var(--border);
-        }
-        .s-dot {
-            width: 25px; height: 25px; border-radius: 50%; flex: none; z-index: 1;
-            display: grid; place-items: center; font-size: 12px; font-weight: 700;
-            background: var(--surface-2); color: var(--muted); border: 1px solid var(--border);
-        }
-        .s-item.done .s-dot { background: var(--accent-2); color: #fff; border-color: var(--accent-2); }
-        .s-item.active .s-dot { background: var(--accent); color: #fff; border-color: var(--accent); }
-        .s-text b { display: block; font-size: 12.5px; }
-        .s-text span { font-size: 11px; color: var(--muted); }
+    @media (max-width:1250px) {
+      .topbar {flex-wrap:wrap;gap:12px;}
+      .top-right {margin:0;align-self:auto;}
+      .hero-globe {left:auto;right:4%;}
+      .columns {grid-template-columns:minmax(0,1fr) minmax(315px,.83fr);gap:16px;}
+      .skill-row {grid-template-columns:43px minmax(95px,.9fr) minmax(130px,1fr) 59px;gap:9px;}
+      .skill-icon {width:42px;height:42px;border-radius:12px;}
+      .skill-num {width:59px;}
+    }
+    @media (max-width:1000px) {
+      .columns {grid-template-columns: minmax(0,1fr);}
+      .right-stack {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start;}
+      .progress-card {grid-column:1/-1;}
+      .skill-row {grid-template-columns:49px minmax(140px,.9fr) minmax(140px,1.3fr) 66px;gap:14px;}
+    }
+    @media (max-width:720px) {
+      .app {display:block;padding-top:66px;}
+      .sidebar,.sidebar.expanded {position:fixed;top:0;left:0;width:100%;min-width:0;height:66px;padding:7px 14px;overflow:visible;flex-direction:row;align-items:center;background:#171d3d;}
+      .sidebar-toggle,.sidebar.expanded .sidebar-toggle {position:absolute;left:13px;top:8px;margin:0;width:48px;height:48px;}
+      .brand,.sidebar.expanded .brand {position:absolute;left:74px;top:12px;margin:0;padding:0;justify-content:flex-start;}
+      .brand-mark {width:40px;height:40px;}
+      .brand-copy,.sidebar.expanded .brand-copy {display:block;}
+      .sidebar .nav {display:none;position:absolute;top:66px;left:0;width:min(310px,89vw);padding:16px;background:#171d3d;border-radius:0 0 17px 0;box-shadow:8px 15px 25px rgba(12,12,31,.2);}
+      .sidebar.expanded .nav {display:flex;}
+      .sidebar.expanded .nav-item {justify-content:flex-start;}
+      .sidebar.expanded .nav-copy {display:block;}
+      .sidebar-spacer,.sidebar-deco,.sidebar-footer,.sidebar.expanded .sidebar-footer {display:none;}
+      .main {padding:0 15px 32px;}
+      .topbar {min-height:auto;padding:29px 0 23px;}
+      .topbar h1 {font-size:29px;letter-spacing:-1px;}
+      .topbar p {font-size:12px;}
+      .eyebrow {margin-bottom:13px;}
+      .hero-globe {width:180px;height:116px;right:0;top:4px;opacity:.24;}
+      .top-right {gap:8px;}
+      .pill {min-height:39px;padding:7px 10px;font-size:11px;}
+      .secure-pill small {font-size:9px;}
+      .right-stack {display:flex;}
+      .card-pad {padding:20px;}
+      .skill-row {grid-template-columns:42px minmax(0,1fr) 60px;gap:10px;padding:17px 0;}
+      .skill-meta {grid-column:2;}
+      .skill-slider-row {grid-column:2 / 4;grid-row:2;}
+      .skill-num {grid-column:3;grid-row:1;width:60px;}
+      .skill-icon {grid-row:1;}
+      .skill-desc {max-width:none;}
+      .skill-goal-row {padding:14px 20px;}
+      .save-card .card-pad {display:flex;flex-direction:column;align-items:stretch;}
+      .save-actions {width:100%;}
+      .recap-grid {grid-template-columns:repeat(2,minmax(0,1fr));}
+    }
+    @media (prefers-reduced-motion:reduce) {*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important;}}
 
-        /* ---------- Seats (join state) ---------- */
-        .seats-mini { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
-        .seat-chip {
-            display: flex; align-items: center; gap: 6px;
-            border: 1px solid var(--border); border-radius: 999px; padding: 5px 10px 5px 6px;
-            font-size: 11.5px; font-weight: 600; background: var(--surface-2);
-        }
-        .seat-chip .flag { font-size: 14px; }
-        .seat-chip.ready { border-color: var(--accent-2); color: var(--accent-2); background: #effaf6; }
-        .seat-chip.me { outline: 2px solid var(--accent); outline-offset: 1px; }
 
-        /* ---------- Result view ---------- */
-        .relation-board {
-            position: relative; height: 300px; border-radius: 16px;
-            background:
-                radial-gradient(420px 220px at 15% 15%, rgba(91,91,214,.10), transparent 60%),
-                radial-gradient(420px 220px at 85% 80%, rgba(20,163,139,.10), transparent 60%),
-                var(--surface-2);
-            border: 1px solid var(--border);
-            overflow: hidden;
-        }
-        .relation-node {
-            position: absolute; transform: translate(-50%, -50%);
-            display: flex; flex-direction: column; align-items: center; gap: 4px;
-        }
-        .relation-node .bubble {
-            width: 54px; height: 54px; border-radius: 50%; background: var(--surface);
-            border: 2px solid var(--border); display: grid; place-items: center; font-size: 26px;
-            box-shadow: var(--shadow); transition: border-color .3s, box-shadow .3s;
-        }
-        .relation-node.me .bubble { border-color: var(--accent); }
-        .relation-node.match .bubble { border-color: var(--accent-2); box-shadow: 0 0 0 5px rgba(20,163,139,.15); }
-        .relation-node .node-label { font-size: 11px; font-weight: 700; background: var(--surface); padding: 1px 8px; border-radius: 999px; border: 1px solid var(--border); }
-        .relation-line { position: absolute; pointer-events: none; }
+    /* =============================================================
+       RAMC — MATCHING DASHBOARD (paleta de referencia)
+       Ajustes estrictamente visuales; no modifica el protocolo MPC.
+       ============================================================= */
+    :root {
+      --bg:#f4f5ff;
+      --surface:#fff;
+      --surface-2:#f6f6ff;
+      --ink:#0b1539;
+      --muted:#566387;
+      --border:#dce0fa;
+      --purple:#633cff;
+      --purple-dark:#552cdb;
+      --purple-light:#a275ff;
+      --purple-soft:#ece8ff;
+      --teal:#008875;
+      --teal-soft:#e4f9f4;
+      --sidebar:#111b3b;
+      --shadow: 0 12px 26px rgba(86,80,186,.085), 0 3px 10px rgba(103,97,176,.025);
+      --radius:24px;
+    }
+    body {
+      background:
+        radial-gradient(ellipse 39% 26% at 61% 1%,rgba(135,131,246,.28),transparent 79%),
+        radial-gradient(ellipse 29% 34% at 97% 7%,rgba(194,201,251,.62),transparent 82%),
+        linear-gradient(135deg,#fafaff 0%,#f5f5ff 43%,#ebecff 100%);
+      color:var(--ink);font-size:14px;
+    }
+    .app {min-height:100vh;}
 
-        .result-headline { text-align: center; padding: 6px 0 2px; }
-        .result-headline .kicker { font-size: 12.5px; color: var(--muted); margin-bottom: 6px; }
-        .result-headline .value { font-size: 44px; font-weight: 800; letter-spacing: -1px; }
-        .result-headline .value.ok { background: linear-gradient(135deg, var(--accent), var(--accent-2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
-        .result-headline .value.none { color: var(--danger); font-size: 28px; }
-        .result-headline .sub { font-size: 13px; color: var(--muted); margin-top: 2px; }
+    /* Barra de navegación oscura y botones compactos */
+    .sidebar {
+      width:88px;min-width:88px;
+      background:linear-gradient(180deg,#111a39 0%,#0e1837 52%,#141d40 100%);
+      padding:18px 15px 20px;
+      border-right:1px solid rgba(255,255,255,.075);
+    }
+    .sidebar.expanded {width:248px;min-width:248px;}
+    .sidebar-toggle {
+      width:56px;height:55px;margin:0 auto 21px;border-radius:17px;
+      background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.06);
+      color:#fff;
+    }
+    .sidebar-toggle:hover {background:#20294e;}
+    .brand {margin-bottom:23px;}
+    .brand-mark {
+      width:56px;height:54px;border-radius:14px;
+      background:linear-gradient(140deg,#6d53fa 0%,#4164d6 44%,#19b6b1 100%);
+      box-shadow:0 8px 20px rgba(19,20,62,.22);
+    }
+    .brand-mark svg{width:25px;height:25px;}
+    .nav{gap:12px;}
+    .nav-item{min-height:56px;padding:12px;border-radius:14px;color:#ecedff;}
+    .nav-item.active {background:linear-gradient(135deg,#6358fb,#5d41f3);box-shadow:0 7px 18px rgba(44,38,143,.26);}
+    .nav-item:not(.active):hover{background:#252d50;}
+    .nav-icon {width:24px;height:24px;}
+    .sidebar-deco{opacity:0;}
+    .sidebar.expanded .sidebar-deco{opacity:.55;}
 
-        .badge-complement {
-            display: inline-flex; align-items: center; gap: 5px;
-            background: #effaf6; color: var(--accent-2); border-radius: 999px;
-            padding: 3px 10px; font-size: 11px; font-weight: 700; margin-left: 8px;
-        }
+    /* Cabecera con iluminación lavanda, globo y dos píldoras */
+    .main {padding:0 clamp(21px,1.65vw,31px) 64px;max-width:1800px;}
+    .main::before {
+      height:270px;
+      background:
+        radial-gradient(ellipse 37% 82% at 55% 6%,rgba(141,142,251,.32),transparent 78%),
+        radial-gradient(ellipse 39% 76% at 99% 0%,rgba(207,215,255,.68),transparent 80%),
+        linear-gradient(180deg,rgba(248,249,255,.45),rgba(247,248,255,0));
+    }
+    .main::after {
+      content:"";pointer-events:none;position:absolute;z-index:-1;
+      top:136px;right:0;width:53%;height:96px;
+      opacity:.5;border-radius:60% 0 0 0 / 78% 0 0 0;
+      background:linear-gradient(105deg,rgba(153,162,252,0),rgba(176,187,252,.26) 52%,rgba(255,255,255,0));
+      transform:skewY(-4deg);
+    }
+    .topbar {min-height:223px;align-items:flex-start;padding:36px 0 33px;gap:15px;}
+    .intro {padding-top:0;max-width:720px;flex:1 1 610px;}
+    .eyebrow {
+      margin-bottom:21px;padding:8px 15px;
+      color:#5711ae;border-color:#e4dbff;background:rgba(237,229,255,.78);
+      font-size:12px;font-weight:800;letter-spacing:-.15px;
+      box-shadow:inset 0 -2px 0 rgba(91,50,204,.025);
+    }
+    .eyebrow svg{width:18px;height:18px;}
+    .topbar h1 {
+      font:800 clamp(33px,3.2vw,45px)/1.13 Manrope,sans-serif;
+      margin:0 0 10px;letter-spacing:-2.05px;color:#0b1536;
+      white-space:nowrap;
+    }
+    .topbar h1 .highlight {
+      background:linear-gradient(100deg,#b475ff 5%,#804cea 47%,#5831c9 100%);
+      -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+    }
+    .topbar p{font-size:15px;line-height:1.55;font-weight:500;color:#59678e;max-width:720px;}
+    .top-right{margin:8px 0 0 auto;align-self:flex-start;gap:13px;flex:none;}
+    .pill {
+      min-height:52px;padding:9px 18px;border-radius:999px;
+      background:rgba(255,255,255,.87);
+      border:1px solid #d7dcfb;
+      box-shadow:0 8px 19px rgba(82,79,173,.13);
+      font-size:12px;color:#101735;
+    }
+    .pill .my-flag{font-size:19px;color:#8868eb;}
+    .country-select{width:110px;max-width:170px;color:#0c1535;font-size:12px;font-weight:800;}
+    #my-seat-label{color:#0b1539;font-weight:800;}
+    .select-chevron{width:15px;stroke:#0b1539;opacity:1;}
+    .secure-pill{color:#008467;background:rgba(230,250,245,.93);border-color:#d7edea;padding:8px 17px;}
+    .secure-pill svg{width:21px;height:21px;}
+    .secure-pill small{font-size:10px;color:#526888;margin-top:3px;}
+    .secure-pill.is-offline{color:#8a536a;background:#faf2f5;border-color:#efdce6;}
+    .hero-globe{width:350px;height:205px;top:0;left:44%;opacity:.75;filter:drop-shadow(0 0 23px rgba(130,136,244,.23));}
 
-        .recap-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 10px; }
-        .recap-cell { border: 1px solid var(--border); border-radius: 10px; padding: 8px; text-align: center; background: var(--surface-2); }
-        .recap-cell .v { font-weight: 700; font-size: 14px; }
-        .recap-cell .l { font-size: 10px; color: var(--muted); }
+    /* Paneles blanco translúcido con bordes lavanda */
+    .columns {grid-template-columns:minmax(0,1.48fr) minmax(355px,1fr);gap:20px;}
+    .left-stack,.right-stack{gap:19px;}
+    .card{
+      border:1px solid rgba(217,222,252,.98);
+      background:rgba(255,255,255,.83);
+      border-radius:24px;
+      box-shadow:var(--shadow);backdrop-filter:blur(18px);
+    }
+    .card-pad{padding:28px 34px 30px;}
+    .card-heading{margin-bottom:7px;gap:12px;}
+    .card-title{font:800 20px/1.36 Manrope,sans-serif;letter-spacing:-.55px;gap:17px;color:#0b1539;}
+    .step-num{
+      width:39px;height:39px;border-radius:50%;
+      background:linear-gradient(145deg,#6e53ff,#5029e5);
+      box-shadow:0 6px 13px rgba(91,56,241,.17);font-size:17px;
+    }
+    .ideal-badge{
+      color:#4f18c1;background:#f2eeff;border:1px solid #d6c9ff;
+      font-weight:800;font-size:13px;padding:8px 14px;
+    }
+    .ideal-badge svg{width:20px;height:20px;}
+    .card-sub{font-size:12px;color:#47577c;margin:0 0 17px;line-height:1.6;}
 
-        .meaning-list { display: flex; flex-direction: column; gap: 14px; }
-        .meaning-item { display: flex; gap: 10px; align-items: flex-start; }
-        .meaning-item .info-icon { background: var(--accent-soft); color: var(--accent); }
-        .meaning-item h4 { margin: 0 0 2px; font-size: 13px; font-weight: 700; }
-        .meaning-item p { margin: 0; font-size: 12px; color: var(--muted); line-height: 1.5; }
+    /* Formulario: íconos pasteles, números, y barra violeta */
+    .skill-row {
+      grid-template-columns:60px minmax(170px,1fr) minmax(175px,1.32fr) 78px;
+      gap:18px;padding:23px 0;min-height:117px;
+      border-bottom:1px solid #e9ebf8;
+    }
+    .skill-icon{width:60px;height:60px;border-radius:17px;background:var(--skill-soft);color:var(--skill-color);}
+    .skill-icon svg{width:28px;height:28px;stroke-width:2.2;}
+    .skill-name{font:800 14px/1.32 Manrope,sans-serif;letter-spacing:-.13px;}
+    .skill-desc{font-size:12px;line-height:1.42;color:#4b5a80;max-width:235px;margin-top:4px;}
+    .skill-slider-row input[type="range"]{
+      height:10px;margin:13px 0 9px;
+      background:linear-gradient(to right,#633cff 0%,#633cff var(--progress,50%),#d5d7e5 var(--progress,50%),#d5d7e5 100%);
+    }
+    .skill-slider-row input[type="range"]::-webkit-slider-thumb{
+      width:24px;height:24px;border-radius:50%;border:3px solid #6742ff;
+      box-shadow:0 2px 7px rgba(92,53,238,.2);background:#fff;
+    }
+    .skill-slider-row input[type="range"]::-moz-range-thumb{
+      width:19px;height:19px;border:3px solid #6742ff;background:#fff;
+    }
+    .slider-ruler{font-size:12px;color:#526086;font-weight:500;}
+    .slider-ruler .ideal{font-weight:800;color:#6037ed;}
+    .skill-num{
+      width:78px;height:45px;background:rgba(250,251,255,.95);
+      border:1px solid #cfd5f1;box-shadow:0 2px 5px rgba(79,78,148,.075);
+      border-radius:12px;font-size:16px;font-weight:800;color:#0f152d;
+    }
+    .skill-goal-row{background:linear-gradient(90deg,#f9f7ff,#f2efff);color:#69658d;}
+    .skill-goal-row b{color:#6439e5;}
+    .save-card{background:rgba(255,255,255,.88);}
+    .save-card .card-pad{grid-template-columns:minmax(0,1fr) minmax(180px,220px);}
+    .save-card .card-title{font-size:16px;}
+    button.primary{background:linear-gradient(100deg,#754df9,#5d35e9);font-weight:800;font-size:12px;}
+    button.primary.is-ready{background:#f0eaff;border:1px solid #d9c9ff;color:#6031d2;}
 
-        details.tech { font-size: 11.5px; color: var(--muted); }
-        details.tech summary { cursor: pointer; font-weight: 600; padding: 4px 0; }
-        #output {
-            display: block; width: 100%; height: 160px; margin-top: 8px;
-            background: #0f1220; color: #d7dcf0; border-radius: 10px; border: none;
-            font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11.5px; padding: 10px 12px;
-            resize: none;
-        }
-        #status { font-size: 11.5px; color: var(--muted); margin-top: 6px; }
+    /* Identidad, cantidad y conectados */
+    .session-card{padding:27px 26px;min-height:129px;}
+    .session-grid{grid-template-columns:minmax(0,1.03fr) minmax(0,.97fr);gap:19px;}
+    .session-country{gap:13px;}
+    .session-icon{width:51px;height:51px;background:transparent;color:#8962ef;}
+    .my-country-flag{font-size:35px;line-height:1;color:#8b68ed;}
+    .session-label{font-size:12px;color:#536087;line-height:1.2;margin-bottom:4px;}
+    .session-name{font:800 20px/1.24 Manrope,sans-serif;color:#0d1637;letter-spacing:-.55px;}
+    .session-count{border-left:1px solid #d4d5f6;padding-left:28px;}
+    .session-count .count-num{font-size:19px;white-space:nowrap;}
+    .session-count .count-num small{font-size:12px;font-weight:700;color:#192240;}
+    .count-track{gap:6px;margin-top:12px;}
+    .count-track span{height:9px;background:#d7d9e9;border-radius:20px;}
+    .count-track span.connected{background:linear-gradient(90deg,#7356f4,#a48cf9);}
+    .seats-mini{margin-top:6px;gap:5px;}
+    .seat-chip{font-size:9px;padding:4px 7px;}
 
-        @media (max-width: 720px) {
-            .app { flex-direction: column; }
-            .sidebar { width: auto; flex-direction: row; flex-wrap: wrap; align-items: center; }
-            .sidebar-globe, .sidebar-footer { display: none; }
-            nav.nav { flex-direction: row; flex-wrap: wrap; margin-bottom: 0; }
-            .recap-grid { grid-template-columns: repeat(2, 1fr); }
-        }
-    </style>
+    /* "Cómo funciona" sobre fondo blanco, como la imagen */
+    .privacy-card{
+      border:1px solid rgba(217,222,252,.98);
+      color:#101b3d;
+      background:rgba(255,255,255,.80);
+    }
+    .privacy-card::before,.privacy-card::after{display:none;}
+    .privacy-body{padding:24px 24px;grid-template-columns:minmax(0,1fr) 115px;gap:9px;min-height:192px;}
+    .privacy-card h3{color:#0b1539;font:800 19px/1.32 Manrope,sans-serif;margin:0 0 19px;letter-spacing:-.55px;}
+    .privacy-title{display:flex;align-items:center;gap:13px;}
+    .privacy-title-icon{width:33px;height:35px;display:grid;place-items:center;flex:none;color:#fff;}
+    .privacy-title-icon svg{width:33px;height:35px;}
+    .privacy-points{gap:15px;}
+    .privacy-point{gap:12px;font-size:12px;line-height:1.45;color:#192647;align-items:flex-start;}
+    .privacy-point strong{font-weight:800;color:#0a1735;}
+    .privacy-tick{width:28px;height:28px;flex:none;margin:0;border-radius:50%;background:#e6dfff;color:#5c37f5;font-weight:900;font-size:17px;}
+    .privacy-graphic{color:#7150fc;opacity:1;}
+    .privacy-graphic svg{width:112px;height:128px;}
+
+    /* Stepper "¿Qué sigue?" */
+    .progress-card .card-pad{padding:24px 26px 25px;}
+    .progress-card .card-title{font-size:20px;gap:13px;margin:0 0 15px;}
+    .rocket-head{font-size:29px;line-height:1;filter:drop-shadow(0 2px 3px rgba(82,55,206,.12));}
+    .stepper{padding-left:15px;}
+    .s-item{padding:5px 0 9px;gap:16px;min-height:69px;}
+    .s-item:not(:last-child)::before{top:42px;bottom:-12px;left:20px;width:2px;background:#cbd0eb;}
+    .s-dot{width:42px;height:42px;border:0;background:#dee0ee;color:#182245;font:800 17px Manrope,sans-serif;}
+    .s-item.done .s-dot{background:#189c88;}
+    .s-item.active .s-dot{border:0;background:linear-gradient(135deg,#6945ff,#5429e6);box-shadow:0 5px 13px rgba(85,51,223,.15);}
+    .s-text{padding:9px 0 0;}
+    .s-text b{font-size:12px;font-weight:800;color:#0c173a;line-height:1.35;}
+    .s-text span{font-size:12px;color:#53618b;margin-top:2px;}
+    .s-item.active .s-text{background:#ece9ff;padding:10px 17px;margin:0;border-radius:17px;}
+
+    /* Pantalla final: mantiene el mismo sistema de diseño */
+    .relation-board{background:radial-gradient(circle at 50% 46%,rgba(145,122,251,.13),transparent 57%),linear-gradient(135deg,#fcfcff,#f1f1ff);border-color:#dfe1fb;}
+    .relation-node.me .bubble{border-color:#6841fa;}
+    .relation-node.match .bubble{border-color:#12a08d;}
+    .result-headline .value.ok,.recap-cell .v{color:#6436e5;}
+    .recap-cell{background:#f1eeff;border-color:#dfd9fb;}
+    .info-icon{background:#efebff;color:#643bdf;}
+    .result-privacy-copy{color:#536084!important;}
+    details.tech{border-color:#dfe2fb;background:rgba(255,255,255,.85);}
+
+    @media(max-width:1370px){
+      .columns{grid-template-columns:minmax(0,1.5fr) minmax(325px,.95fr);gap:16px;}
+      .topbar{flex-wrap:wrap;gap:10px;}
+      .top-right{margin:0 0 0 auto;}
+      .skill-row{grid-template-columns:52px minmax(132px,1fr) minmax(140px,1.25fr) 68px;gap:12px;}
+      .skill-icon{width:51px;height:51px;}
+      .skill-num{width:68px;}
+      .privacy-body{grid-template-columns:minmax(0,1fr) 80px;}
+      .privacy-graphic svg{width:85px;}
+      .card-pad{padding:26px 28px;}
+    }
+    @media(max-width:1040px){
+      .columns{grid-template-columns:minmax(0,1fr);}
+      .right-stack{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start;}
+      .progress-card{grid-column:1/-1;}
+      .topbar h1{white-space:normal;}
+      .top-right{margin:0;}
+      .hero-globe{left:auto;right:5%;opacity:.37;}
+      .skill-row{grid-template-columns:60px minmax(170px,1fr) minmax(200px,1.3fr) 78px;gap:16px;}
+      .skill-icon{width:60px;height:60px;}
+      .skill-num{width:78px;}
+    }
+    @media(max-width:720px){
+      .app{padding-top:66px;}
+      .sidebar,.sidebar.expanded{width:100%;min-width:0;height:66px;padding:7px 14px;background:#111b3b;}
+      .sidebar-toggle,.sidebar.expanded .sidebar-toggle{top:7px;left:12px;width:49px;height:50px;}
+      .brand,.sidebar.expanded .brand{top:12px;left:72px;}
+      .brand-mark{width:42px;height:42px;}
+      .sidebar .nav{background:#111b3b;}
+      .main{padding:0 14px 34px;}
+      .topbar{min-height:0;padding:26px 0 22px;}
+      .topbar h1{font-size:29px;letter-spacing:-1.1px;white-space:normal;}
+      .topbar p{font-size:12px;}
+      .eyebrow{font-size:10px;margin-bottom:14px;}
+      .hero-globe{width:200px;height:118px;right:0;top:4px;opacity:.22;}
+      .top-right{margin:12px 0 0;gap:7px;}
+      .pill{min-height:42px;padding:7px 11px;font-size:11px;}
+      .secure-pill small{font-size:9px;}
+      .right-stack{display:flex;}
+      .card-pad{padding:21px;}
+      .card-title{font-size:16px;gap:9px;}
+      .step-num{width:33px;height:33px;font-size:13px;}
+      .card-sub{font-size:11px;}
+      .ideal-badge{font-size:11px;}
+      .skill-row{grid-template-columns:48px minmax(0,1fr) 67px;gap:11px;min-height:0;padding:18px 0;}
+      .skill-icon{width:48px;height:48px;border-radius:12px;grid-row:1;}
+      .skill-icon svg{width:23px;height:23px;}
+      .skill-meta{grid-column:2;}
+      .skill-slider-row{grid-column:2/4;grid-row:2;}
+      .skill-num{grid-column:3;grid-row:1;width:67px;}
+      .skill-desc{max-width:none;}
+      .session-card{padding:23px 20px;}
+      .session-count{padding-left:16px;}
+      .session-name{font-size:16px;}
+      .privacy-body{padding:21px;grid-template-columns:minmax(0,1fr) 65px;min-height:0;}
+      .privacy-card h3{font-size:16px;}
+      .privacy-graphic svg{width:65px;}
+      .privacy-point{font-size:11px;}
+      .progress-card .card-title{font-size:17px;}
+      .recap-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
+    }
+
+    /* Ajuste final de escala y espaciado a la maqueta recibida */
+    @media (min-width:1041px) {
+      .intro { padding-left:24px; }
+      .card-title {font-size:22px;gap:21px;}
+      .card-sub {font-size:14px;}
+      .skill-row {padding-top:26px;padding-bottom:26px;min-height:122px;}
+      .skill-icon {transform:translateX(9px);}
+      .skill-meta {transform:translateX(12px);}
+      .skill-name{font-size:16px;}
+      .skill-desc{font-size:14px;line-height:1.45;}
+      .skill-slider-row .slider-wrap{width:calc(100% - 18px);}
+      .skill-num{margin-left:4px;}
+      .session-label{font-size:13px;}
+      .privacy-card h3{font-size:21px;}
+      .privacy-point{font-size:13px;}
+      .privacy-body{min-height:194px;}
+      .progress-card .card-title{font-size:21px;}
+      .s-text b{font-size:14px;}
+      .s-text span{font-size:13px;}
+      .s-item{min-height:70px;}
+    }
+    @media (max-width:1040px) and (min-width:721px){
+      .card-title{font-size:20px;}
+      .skill-name{font-size:15px;}
+      .skill-desc{font-size:13px;}
+      .privacy-point{font-size:12px;}
+    }
+
+    /* Ícono de participantes a la derecha, idéntico al esquema visual */
+    .session-grid{grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);}
+    .session-count{padding-left:23px;}
+    .participant-heading{display:flex;align-items:center;gap:13px;}
+    .people-icon{flex:none;display:grid;place-items:center;width:43px;height:43px;border-radius:50%;color:#364882;background:rgba(255,255,255,.90);}
+    .participant-heading .session-label{margin-bottom:4px;}
+    .session-count .count-track{margin-top:12px;}
+    @media (max-width:1250px){.session-grid{grid-template-columns:1fr 1fr;}.people-icon{width:32px;height:32px;}.people-icon svg{width:21px;height:21px;}.session-count{padding-left:14px;}.participant-heading{gap:7px;}}
+    @media (max-width:720px){.session-count{padding-left:10px;}.people-icon{width:28px;height:28px;}.people-icon svg{width:17px;height:17px;}.participant-heading{gap:4px;}.session-label{font-size:10px;}.session-count .count-num{font-size:16px;}.session-count .count-num small{font-size:9px;}}
+    @media(max-width:720px){.top-right{width:100%;}.pill{padding-left:8px;padding-right:8px;}}
+  </style>
 </head>
 <body>
 <div class="app">
+  <!-- ==================== SIDEBAR ==================== -->
+  <aside class="sidebar" id="surplus-sidebar">
+    <button type="button" class="sidebar-toggle" id="surplus-menu-toggle" aria-label="Abrir menú" aria-expanded="false" aria-controls="surplus-nav" title="Abrir menú">
+      <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h12"/></svg>
+    </button>
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true">
+        <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 4 6 4 9s-1.5 6.4-4 9c-2.5-2.6-4-6-4-9s1.5-6.4 4-9z"/></svg>
+      </div>
+      <div class="brand-copy"><div class="brand-name">Surplus</div><div class="brand-sub">Skills without borders</div></div>
+    </div>
+    <nav class="nav" id="surplus-nav">
+      <a class="nav-item active" href="atlas-lobby.html" title="Mi país">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg>
+        <div class="nav-copy"><div class="nav-title">Mi país</div><div class="nav-hint">Mis capacidades y recomendación</div></div>
+      </a>
+      <!-- Mapa global y Red de alianzas ocultos temporalmente. -->
+      <a class="nav-item" href="atlas-how-it-works.html" title="Cómo funciona">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+        <div class="nav-copy"><div class="nav-title">Cómo funciona</div><div class="nav-hint">Tecnología MPC</div></div>
+      </a>
+    </nav>
+    <div class="sidebar-spacer"></div>
+    <div class="sidebar-deco" aria-hidden="true">
+      <svg viewBox="0 0 100 100" fill="none"><circle cx="50" cy="50" r="42" stroke="#8f80d6"/><ellipse cx="50" cy="50" rx="18" ry="42" stroke="#8f80d6"/><path d="M8 50h84" stroke="#8f80d6"/><circle cx="27" cy="32" r="3" fill="#66e7cf"/><circle cx="76" cy="68" r="3" fill="#aa82ef"/></svg>
+    </div>
+    <div class="sidebar-footer">Colaboración inteligente.<br>Información protegida.</div>
+  </aside>
 
-    <!-- ======================= Sidebar ======================= -->
-    <aside class="sidebar">
-        <div class="brand">
-            <div class="brand-mark" aria-hidden="true">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 4 6 4 9s-1.5 6.4-4 9c-2.5-2.6-4-6-4-9s1.5-6.4 4-9z"/></svg>
+  <!-- ==================== MAIN ==================== -->
+  <main class="main">
+    <header class="topbar">
+      <div class="hero-globe" aria-hidden="true">
+        <svg viewBox="0 0 380 216" xmlns="http://www.w3.org/2000/svg" fill="none">
+          <defs>
+            <radialGradient id="orbFill" cx="0" cy="0" r="1" gradientTransform="translate(210 95) rotate(105) scale(148)"><stop stop-color="#e1e3ff" stop-opacity=".88"/><stop offset=".7" stop-color="#c1c6ff" stop-opacity=".43"/><stop offset="1" stop-color="#b4c1ff" stop-opacity=".04"/></radialGradient>
+            <linearGradient id="land" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#c8cfff" stop-opacity=".85"/><stop offset="1" stop-color="#9daaf8" stop-opacity=".43"/></linearGradient>
+            <clipPath id="clipOrb"><circle cx="204" cy="116" r="115"/></clipPath>
+            <filter id="dotGlow" x="-150%" y="-150%" width="400%" height="400%"><feGaussianBlur stdDeviation="4"/></filter>
+          </defs>
+          <circle cx="204" cy="116" r="115" fill="url(#orbFill)" stroke="#f8f8ff" stroke-opacity=".4"/>
+          <g clip-path="url(#clipOrb)">
+            <path d="M82 83 97 51l22-17 21-6 10 11-12 12 4 11-21 4-8 18-13 6 2 29-17 15-17-18Z" fill="url(#land)"/>
+            <path d="m125 121 17-9 23 12 4 18-12 13-4 24-20 31-13-4 1-25-13-21 4-18Z" fill="url(#land)"/>
+            <path d="m161 35 35-18 35 8 19-7 39 17 18 20-13 10-24-8-13 11-19-6-13 16-25-5-18-14-21 2-10-15Z" fill="url(#land)"/>
+            <path d="m197 74 29-8 15 16-2 19 20 14-3 36-16 32-22 5-22-31-12-29 1-27Z" fill="url(#land)"/>
+            <path d="m278 137 32-7 20 20-3 25-20 14-28-15-10-20Z" fill="url(#land)"/>
+            <path d="M92 74c63-43 159-50 223 8M80 128c92-74 164-73 246-6M111 179c58-90 115-102 206-88" stroke="#fff" stroke-width="1.1" stroke-dasharray="2.5 3" stroke-opacity=".9"/>
+            <path d="M85 135c25-50 73-83 136-90 40-4 75 18 92 56M140 53c48 12 84 47 101 116" stroke="#fff" stroke-width="1.15" stroke-opacity=".65"/>
+            <ellipse cx="204" cy="116" rx="55" ry="115" stroke="#fff" stroke-opacity=".28"/>
+          </g>
+          <g fill="#fff"><circle cx="91" cy="115" r="7" opacity=".68" filter="url(#dotGlow)"/><circle cx="152" cy="109" r="7" opacity=".8" filter="url(#dotGlow)"/><circle cx="205" cy="44" r="7" opacity=".75" filter="url(#dotGlow)"/><circle cx="294" cy="119" r="7" opacity=".7" filter="url(#dotGlow)"/><circle cx="91" cy="115" r="3.4"/><circle cx="152" cy="109" r="3.5"/><circle cx="205" cy="44" r="3.6"/><circle cx="294" cy="119" r="3.5"/></g>
+        </svg>
+      </div>
+      <div class="intro">
+        <div class="eyebrow"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="m12 2 9 5-9 5-9-5 9-5Zm-9 10 9 5 9-5M3 17l9 5 9-5"/></svg> ATLAS · PRIVATE MATCHING</div>
+        <h1 id="page-title">Encuentra tu mejor <span class="highlight">aliado</span></h1>
+        <p id="page-sub">RAMC analiza, de forma privada, qué país complementa mejor tus capacidades.</p>
+      </div>
+      <div class="top-right">
+        <div class="pill">
+          <span class="my-flag" id="my-flag">⚑</span>
+          <select class="country-select" id="country-select" aria-label="Selecciona tu país">
+            <option value="">Elige tu país</option>
+            <option value="🇲🇽|México">México</option>
+            <option value="🇨🇦|Canadá">Canadá</option>
+            <option value="🇨🇴|Colombia">Colombia</option>
+            <option value="🇯🇵|Japón">Japón</option>
+            <option value="🇩🇪|Alemania">Alemania</option>
+            <option value="🇧🇷|Brasil">Brasil</option>
+            <option value="🇫🇷|Francia">Francia</option>
+            <option value="🇰🇷|Corea del Sur">Corea del Sur</option>
+            <option value="🇪🇸|España">España</option>
+            <option value="🇺🇸|Estados Unidos">Estados Unidos</option>
+            <option value="🇮🇹|Italia">Italia</option>
+            <option value="🇬🇧|Reino Unido">Reino Unido</option>
+          </select>
+          <svg class="select-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+          <span id="my-seat-label">(P?)</span>
+        </div>
+        <div class="pill secure-pill is-offline" id="connection-pill">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+          <span><span id="connection-label">Conectando…</span><small>Tus datos permanecen privados</small></span>
+        </div>
+      </div>
+    </header>
+
+    <div class="error-box" id="lobby-error" role="alert"></div>
+
+    <!-- ==================== LOBBY / SKILLS ==================== -->
+    <section id="view-skills">
+      <div class="columns">
+        <div class="left-stack">
+          <div class="card">
+            <div class="card-pad">
+              <div class="card-heading">
+                <h2 class="card-title"><span class="step-num">1</span> Configura tus capacidades</h2>
+                <span class="ideal-badge"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1" fill="currentColor"/></svg> Ideal: 10</span>
+              </div>
+              <p class="card-sub">Ingresa un valor del 0 al 20 para cada capacidad. El valor ideal es 10 — más significa excedente, menos déficit.</p>
+              <div id="skills-list"></div>
             </div>
-            <div>
-                <div class="brand-name">Surplus</div>
-                <div class="brand-sub">Skills without borders</div>
+            <div class="skill-goal-row"><span>REFERENCIA POR CAPACIDAD</span><b>10 / 20</b></div>
+          </div>
+          <div class="card save-card">
+            <div class="card-pad">
+              <div>
+                <h2 class="card-title"><span class="step-num">2</span> Confirma tu participación</h2>
+                <p class="card-sub">Tus valores se preparan localmente para el cálculo MPC cuando todos estén listos.</p>
+              </div>
+              <div class="save-actions">
+                <button type="button" class="primary" id="ready-btn" disabled>Guardar y participar</button>
+                <p class="hint-line" id="ready-hint">Esperando asignación…</p>
+              </div>
             </div>
+          </div>
         </div>
 
-        <nav class="nav">
-            <a class="nav-item active" href="atlas-lobby.html">
-                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg>
-                <div><div>Mi país</div><div class="nav-hint">Mis habilidades y recomendación</div></div>
-            </a>
-            <div class="nav-item disabled"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 4 6 4 9s-1.5 6.4-4 9c-2.5-2.6-4-6-4-9s1.5-6.4 4-9z"/></svg><div><div>Mapa global</div><div class="nav-hint">Países participantes</div></div><span class="soon">pronto</span></div>
-            <div class="nav-item disabled"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="12" cy="18" r="2.5"/><path d="M8 7.3 10.3 16M16 7.3 13.7 16M8.5 6h7"/></svg><div><div>Red de alianzas</div><div class="nav-hint">Conexiones públicas</div></div><span class="soon">pronto</span></div>
-            <a class="nav-item" href="atlas-how-it-works.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg><div><div>Cómo funciona</div><div class="nav-hint">Tecnología MPC</div></div></a>
-        </nav>
+        <div class="right-stack">
+          <div class="card session-card">
+            <div class="session-grid">
+              <div class="session-country">
+                <div class="session-icon"><span class="my-country-flag" id="side-flag">⚑</span></div>
+                <div><div class="session-label" id="side-seat">P? (Tú)</div><div class="session-name" id="side-country">Sin asignar</div></div>
+              </div>
+              <div class="session-count">
+                <div class="participant-heading">
+                  <div class="people-icon" aria-hidden="true">
+                    <svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M16 19v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="3"/><path d="M22 19v-2a4 4 0 0 0-3-3.87M16 4.13a3 3 0 0 1 0 5.75"/></svg>
+                  </div>
+                  <div>
+                    <div class="session-label">Participantes</div>
+                    <div class="count-num"><span id="connected-count">0</span> <small id="session-size">/ 4 conectados</small></div>
+                  </div>
+                </div>
+                <div class="count-track" id="count-track" aria-label="Progreso de conexión"></div>
+              </div>
+            </div>
+            <div class="seats-mini" id="seats-mini"></div>
+          </div>
 
-        <div class="sidebar-globe" aria-hidden="true">
-            <svg width="110" height="110" viewBox="0 0 110 110" fill="none">
-                <circle cx="55" cy="55" r="46" stroke="#3a3d66" stroke-width="1.4"/>
-                <circle cx="55" cy="55" r="46" stroke="#5b5bd6" stroke-width="1.4" stroke-dasharray="6 10" opacity=".5"/>
-                <ellipse cx="55" cy="55" rx="46" ry="18" stroke="#3a3d66" stroke-width="1"/>
-                <ellipse cx="55" cy="55" rx="20" ry="46" stroke="#3a3d66" stroke-width="1"/>
-                <circle cx="30" cy="40" r="3" fill="#14a38b"/>
-                <circle cx="75" cy="32" r="3" fill="#5b5bd6"/>
-                <circle cx="68" cy="75" r="3" fill="#5b5bd6"/>
-                <circle cx="35" cy="78" r="3" fill="#14a38b"/>
-            </svg>
+          <div class="card privacy-card">
+            <div class="privacy-body">
+              <div>
+                <h3 class="privacy-title">
+                  <span class="privacy-title-icon" aria-hidden="true">
+                    <svg viewBox="0 0 36 39" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="lockBadge" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#8155ff"/><stop offset="1" stop-color="#5632e3"/></linearGradient></defs><path d="M18 1 33 7v12c0 10-6 16-15 19C9 35 3 29 3 19V7L18 1Z" fill="url(#lockBadge)"/><rect x="12.4" y="16" width="11.2" height="10.6" rx="2" fill="#fff"/><path d="M15 16v-2.8a3 3 0 0 1 6 0V16" fill="none" stroke="#fff" stroke-width="2.1"/><circle cx="18" cy="21" r="1.1" fill="#6a3ef3"/></svg>
+                  </span>Cómo funciona
+                </h3>
+                <div class="privacy-points">
+                  <div class="privacy-point"><span class="privacy-tick">✓</span><span><strong>Tus valores</strong> representan tus recursos actuales en cada capacidad.</span></div>
+                  <div class="privacy-point"><span class="privacy-tick">✓</span><span>El cálculo se realiza de forma privada con ATLAS (MPC), sin revelar tus datos a los demás países.</span></div>
+                </div>
+              </div>
+              <div class="privacy-graphic" aria-hidden="true">
+                <svg viewBox="0 0 140 145" xmlns="http://www.w3.org/2000/svg" fill="none">
+                  <defs><linearGradient id="layerA" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#b7a5ff"/><stop offset="1" stop-color="#6641f2"/></linearGradient><linearGradient id="layerB" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#e0d8ff"/><stop offset="1" stop-color="#a99bf4"/></linearGradient><linearGradient id="lockBody" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#a891ff"/><stop offset="1" stop-color="#623afa"/></linearGradient><filter id="layerShadow" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="7"/></filter></defs>
+                  <ellipse cx="77" cy="126" rx="48" ry="10" fill="#6a46ed" opacity=".17" filter="url(#layerShadow)"/>
+                  <path d="M15 93 70 66l56 27-56 30L15 93Z" fill="#7e61ee" opacity=".28"/>
+                  <path d="m15 93 55 30 56-30v11l-56 29-55-30V93Z" fill="url(#layerA)"/>
+                  <path d="M15 80 70 53l56 27-56 30L15 80Z" fill="#e7dfff" stroke="#fff" stroke-opacity=".9"/>
+                  <path d="m15 80 55 30 56-30v10l-56 29-55-28V80Z" fill="url(#layerB)"/>
+                  <path d="M15 68 70 41l56 27-56 30L15 68Z" fill="#f1ecff" stroke="#fff"/>
+                  <path d="m15 68 55 30 56-30v8l-56 30-55-29V68Z" fill="url(#layerA)" opacity=".77"/>
+                  <path d="M29 55 70 35l42 20-42 23-41-23Z" fill="#fff" opacity=".94"/>
+                  <path d="m29 55 41 23 42-23v9L70 87 29 64v-9Z" fill="#d7ccff"/>
+                  <path d="M58 43V27c0-9 5-15 12-15s12 6 12 15v17" stroke="#6e42f1" stroke-width="6" stroke-linecap="round"/>
+                  <rect x="52" y="37" width="36" height="35" rx="8" fill="url(#lockBody)"/>
+                  <path d="M70 47a4 4 0 0 0-2 7v5h4v-5a4 4 0 0 0-2-7Z" fill="#fff"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="card progress-card">
+            <div class="card-pad">
+              <h2 class="card-title"><span class="rocket-head" aria-hidden="true">🚀</span> ¿Qué sigue?</h2>
+              <div class="stepper" id="stepper">
+                <div class="s-item active" data-step="1"><div class="s-dot">1</div><div class="s-text"><b>Configura tus capacidades</b><span>Completa y guarda el formulario.</span></div></div>
+                <div class="s-item" data-step="2"><div class="s-dot">2</div><div class="s-text"><b>Espera a que todos se unan</b><span id="step2-sub">0/4 conectados</span></div></div>
+                <div class="s-item" data-step="3"><div class="s-dot">3</div><div class="s-text"><b>Se ejecuta el cálculo privado</b><span>Protocolo ATLAS (MPC).</span></div></div>
+                <div class="s-item" data-step="4"><div class="s-dot">4</div><div class="s-text"><b>Recibe tu aliado ideal</b><span>Se muestra el resultado de la evaluación privada.</span></div></div>
+              </div>
+            </div>
+          </div>
         </div>
+      </div>
+    </section>
 
-        <div class="sidebar-footer">
-            <div class="tag">Colaboración segura para<br>un mundo más fuerte.</div>
-            <div class="sidebar-mini-list">
-                <span><i></i> Privacidad</span>
-                <span><i></i> Colaboración</span>
-                <span><i></i> Impacto real</span>
-            </div>
+    <!-- ==================== RESULT ==================== -->
+    <section id="view-result" hidden>
+      <div class="columns">
+        <div class="left-stack">
+          <div class="card"><div class="card-pad">
+            <h2 class="card-title" style="margin-bottom:17px">Tu red de colaboración</h2>
+            <div class="relation-board" id="relation-board"></div>
+            <p class="hint-line" style="margin-top:13px">Las posiciones son ilustrativas; no corresponden a ubicaciones geográficas reales.</p>
+          </div></div>
+          <div class="card"><div class="card-pad">
+            <h2 class="card-title">Tus capacidades actuales</h2>
+            <div class="recap-grid" id="recap-grid"></div>
+          </div></div>
         </div>
-    </aside>
-
-    <!-- ======================= Main ======================= -->
-    <main class="main">
-        <div class="topbar">
-            <div>
-                <h1 id="page-title">Encuentra tu mejor aliado</h1>
-                <p id="page-sub">Surplus analiza, de forma privada, qué país complementa mejor tus capacidades.</p>
+        <div class="right-stack">
+          <div class="card"><div class="card-pad">
+            <div class="result-headline">
+              <div class="kicker" id="result-kicker">Calculando con ATLAS (MPC)…</div>
+              <div class="spinner" id="spinner"></div>
+              <div class="value" id="result-value" hidden></div>
+              <div class="sub" id="result-sub"></div>
             </div>
-            <div class="top-right">
-                <div class="pill">
-                    <span id="my-flag">🏳️</span>
-                    <select class="country-select" id="country-select">
-                        <option value="">Elige tu país</option>
-                        <option value="🇲🇽|México">México</option>
-                        <option value="🇨🇦|Canadá">Canadá</option>
-                        <option value="🇨🇴|Colombia">Colombia</option>
-                        <option value="🇯🇵|Japón">Japón</option>
-                    </select>
-                    <span id="my-seat-label">(P?)</span>
-                </div>
-                <div class="pill secure-pill">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
-                    <span>Conexión segura<small>Tus datos permanecen privados</small></span>
-                </div>
+          </div></div>
+          <div class="card privacy-card"><div class="card-pad">
+            <h3 style="font:800 16px Manrope,sans-serif;margin:0 0 10px">Resultado del cálculo privado</h3>
+            <p class="result-privacy-copy" style="font-size:12px;line-height:1.7;margin:0">La recomendación proviene del protocolo MPC. Recuerda que cualquier resultado revelado puede permitir algunas inferencias sobre las entradas.</p>
+          </div></div>
+          <div class="card"><div class="card-pad">
+            <h2 class="card-title">¿Qué significa esta alianza?</h2>
+            <div class="meaning-list">
+              <div class="meaning-item"><div class="info-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 12 4 4L19 6"/></svg></div><div><h4>Complementa tus capacidades</h4><p>El modelo busca aprovechar excedentes para cubrir déficits.</p></div></div>
+              <div class="meaning-item"><div class="info-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19h16M6 16V9m6 7V4m6 12v-5"/></svg></div><div><h4>Evalúa recursos distintos</h4><p>Considera cada capacidad, no solo la suma de los recursos.</p></div></div>
+              <div class="meaning-item"><div class="info-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="8" r="3"/><path d="M2 20c0-4 3-7 6-7s6 3 6 7M17 11a3 3 0 1 0-2-5M16 14c3 0 6 2 6 6"/></svg></div><div><h4>Colaboración</h4><p>La recomendación identifica un posible aliado bajo las reglas del modelo.</p></div></div>
             </div>
+          </div></div>
         </div>
-
-        <div class="error-box" id="lobby-error"></div>
-
-        <!-- ================= Skills / lobby view ================= -->
-        <section id="view-skills">
-            <div class="columns">
-                <div>
-                    <div class="card">
-                        <div class="card-pad">
-                            <div class="card-title"><span class="step-num">1</span>Configura tus capacidades</div>
-                            <p class="card-sub">Ingresa un valor del 0 al 20 para cada capacidad. El valor ideal es 10 — más significa excedente, menos significa déficit.</p>
-
-                            <div id="skills-list"></div>
-                        </div>
-                        <div class="skill-goal-row"><span>Objetivo ideal por capacidad</span><b>10 / 20</b></div>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-pad">
-                            <div class="card-title"><span class="step-num">2</span>Confirmar y participar</div>
-                            <p class="card-sub">Cuando estés listo, envía tus capacidades para unirte al cálculo privado.</p>
-                            <button class="primary" id="ready-btn" disabled>Guardar y participar</button>
-                            <p class="hint-line" id="ready-hint">Esperando asignación de país…</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div>
-                    <div class="card"><div class="card-pad">
-                        <div class="my-country-card">
-                            <div class="my-country-flag" id="side-flag">🏳️</div>
-                            <div>
-                                <div class="label" id="side-seat">P? (Tú)</div>
-                                <div class="name" id="side-country">Sin asignar</div>
-                            </div>
-                        </div>
-                        <div class="seats-mini" id="seats-mini"></div>
-                    </div></div>
-
-                    <div class="card"><div class="card-pad info-card">
-                        <div class="info-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.5.4.9 1.1.9 1.8v.3h5.2v-.3c0-.7.4-1.4.9-1.8A6 6 0 0 0 12 3z"/></svg></div>
-                        <div><h3>Sobre tus valores</h3><p>Representan tus recursos actuales en cada capacidad y se usan en el cálculo privado con ATLAS para encontrar tu mejor aliado.</p></div>
-                    </div></div>
-
-                    <div class="card"><div class="card-pad info-card">
-                        <div class="info-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></div>
-                        <div><h3>Privacidad garantizada</h3><p>Tus datos se encriptan y procesan mediante MPC con ATLAS. Ningún otro país puede ver tus capacidades ni tus resultados.</p></div>
-                    </div></div>
-
-                    <div class="card"><div class="card-pad">
-                        <div class="card-title" style="margin-bottom:10px">¿Qué sigue?</div>
-                        <div class="stepper" id="stepper">
-                            <div class="s-item" data-step="1"><div class="s-dot">1</div><div class="s-text"><b>Ingresa tus capacidades</b><span>Completa y guarda el formulario</span></div></div>
-                            <div class="s-item" data-step="2"><div class="s-dot">2</div><div class="s-text"><b>Espera a que todos se unan</b><span id="step2-sub">0/0 conectados</span></div></div>
-                            <div class="s-item" data-step="3"><div class="s-dot">3</div><div class="s-text"><b>Se ejecuta el cálculo privado</b><span>Protocolo ATLAS (MPC)</span></div></div>
-                            <div class="s-item" data-step="4"><div class="s-dot">4</div><div class="s-text"><b>Recibe tu recomendación</b><span>Resultado 100% privado</span></div></div>
-                        </div>
-                    </div></div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ================= Result view ================= -->
-        <section id="view-result" hidden>
-            <div class="columns">
-                <div>
-                    <div class="card"><div class="card-pad">
-                        <div class="relation-board" id="relation-board"></div>
-                        <div class="hint-line" style="margin-top:10px">Las posiciones son ilustrativas — no representan ubicación geográfica real.</div>
-                    </div></div>
-
-                    <div class="card"><div class="card-pad">
-                        <div class="card-title" style="margin-bottom:10px">Tus capacidades actuales</div>
-                        <div class="recap-grid" id="recap-grid"></div>
-                    </div></div>
-                </div>
-
-                <div>
-                    <div class="card"><div class="card-pad">
-                        <div class="result-headline">
-                            <div class="kicker" id="result-kicker">Calculado de forma segura con MPC</div>
-                            <div class="spinner" id="spinner" style="width:40px;height:40px;margin:10px auto;border-radius:50%;border:3px solid var(--surface-2);border-top-color:var(--accent);animation:spin .9s linear infinite"></div>
-                            <div class="value" id="result-value" hidden></div>
-                            <div class="sub" id="result-sub"></div>
-                        </div>
-                    </div></div>
-
-                    <div class="card"><div class="card-pad info-card">
-                        <div class="info-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></div>
-                        <div><h3>Privacidad garantizada</h3><p>Solo tú puedes ver esta recomendación. Las capacidades de los demás países permanecen privadas en todo momento.</p></div>
-                    </div></div>
-
-                    <div class="card"><div class="card-pad">
-                        <div class="card-title" style="margin-bottom:10px">¿Qué significa esta alianza?</div>
-                        <div class="meaning-list">
-                            <div class="meaning-item"><div class="info-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div><div><h4>Complementa tus capacidades</h4><p>Ayuda a cubrir tus mayores déficits con el excedente de tu aliado.</p></div></div>
-                            <div class="meaning-item"><div class="info-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20h18M6 20V10m6 10V4m6 16v-7"/></svg></div><div><h4>Fortalece tu estrategia</h4><p>Reduce el déficit más alto entre los dos países.</p></div></div>
-                            <div class="meaning-item"><div class="info-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M2.5 19c0-3 2.9-5.4 6.5-5.4s6.5 2.4 6.5 5.4"/><circle cx="18" cy="8.5" r="2.4"/><path d="M15.8 13.8c2.6.4 4.7 2.3 4.7 5"/></svg></div><div><h4>Más oportunidades</h4><p>Trabajen juntos por una cooperación más fuerte.</p></div></div>
-                        </div>
-                    </div></div>
-                </div>
-            </div>
-
-            <details class="tech">
-                <summary>Detalles técnicos</summary>
-                <div id="status"></div>
-                <textarea id="output" rows="6" readonly spellcheck="false"></textarea>
-            </details>
-        </section>
-    </main>
+      </div>
+      <details class="tech">
+        <summary>Detalles técnicos de la ejecución</summary>
+        <div id="status"></div>
+        <textarea id="output" rows="6" readonly spellcheck="false" aria-label="Registro de ejecución MPC"></textarea>
+      </details>
+    </section>
+  </main>
 </div>
 
 <script>
 (function () {
-    var $ = function (id) { return document.getElementById(id); };
+  'use strict';
+  var $ = function (id) { return document.getElementById(id); };
 
-    // ---- War-scenario skill categories (replace with whatever fits best) ----
-    var SKILLS = [
-        { id: 0, name: 'Defensa', desc: 'Capacidad militar y protección del territorio.', color: '#5b5bd6',
-          icon: '<path d="M12 3 4 6v6c0 5 3.4 8.4 8 9 4.6-.6 8-4 8-9V6l-8-3z"/>' },
-        { id: 1, name: 'Logística', desc: 'Transporte, suministros y cadena de abastecimiento.', color: '#2563eb',
-          icon: '<rect x="2" y="9" width="12" height="8" rx="1.5"/><path d="M14 11h4l3 3v3h-2"/><circle cx="7" cy="18.5" r="1.6"/><circle cx="17.5" cy="18.5" r="1.6"/>' },
-        { id: 2, name: 'Inteligencia', desc: 'Información estratégica y análisis de riesgos.', color: '#14a38b',
-          icon: '<circle cx="12" cy="12" r="3"/><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6z"/>' },
-        { id: 3, name: 'Diplomacia', desc: 'Negociación y relaciones con otros países.', color: '#e08a2b',
-          icon: '<path d="M8 12 3 17l1.5 1.5L7 16M8 12l3-3M8 12l3 3M16 12l5 5-1.5 1.5L17 16M16 12l-3-3M16 12l-3 3M11 9l1-1 1 1"/>' }
-    ];
+  // Las SEIS capacidades de la versión proporcionada por la usuaria.
+  // Los IDs, el orden y los valores 0-20 no se modifican.
+  var SKILLS = [
+    { id:0, name:'Defensa', desc:'Capacidad militar y protección del territorio.', color:'#6f52d9', soft:'#efe9ff',
+      icon:'<path d="M12 3 4 6v6c0 5 3.4 8.4 8 9 4.6-.6 8-4 8-9V6l-8-3z"/>' },
+    { id:1, name:'Logística', desc:'Transporte, suministros y cadena de abastecimiento.', color:'#4a80d2', soft:'#e8f0ff',
+      icon:'<rect x="2" y="9" width="12" height="8" rx="1.5"/><path d="M14 11h4l3 3v3h-2"/><circle cx="7" cy="18.5" r="1.6"/><circle cx="17.5" cy="18.5" r="1.6"/>' },
+    { id:2, name:'Inteligencia', desc:'Información estratégica y análisis de riesgos.', color:'#169e89', soft:'#e5f7f1',
+      icon:'<circle cx="12" cy="12" r="3"/><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6z"/>' },
+    { id:3, name:'Diplomacia', desc:'Negociación y relaciones con otros países.', color:'#d88762', soft:'#fff0e9',
+      icon:'<path d="M8 12 3 17l1.5 1.5L7 16M8 12l3-3M8 12l3 3M16 12l5 5-1.5 1.5L17 16M16 12l-3-3M16 12l-3 3M11 9l1-1 1 1"/>' },
+    { id:4, name:'Tecnología', desc:'Infraestructura tecnológica.', color:'#7857d9', soft:'#eeeaff',
+      icon:'<rect x="4" y="5" width="16" height="12" rx="2"/><path d="M2 20h20M9 17h6"/>' },
+    { id:5, name:'Energía', desc:'Recursos y capacidad energética.', color:'#bb9236', soft:'#fff6dc',
+      icon:'<path d="M13 2 4 13h7l-1 9 10-12h-7z"/>' }
+  ];
 
-    var qp = new URLSearchParams(window.location.search);
-    var room = qp.get('room') || 'atlas-demo';
+  // Parámetros originales de sala y protocolo: NO se alteran.
+  var qp = new URLSearchParams(window.location.search);
+  var room = qp.get('room') || 'atlas-demo';
+  var myIndex = null, mySize = 0, myT = '1', myProgram = 'surplus_matching_private';
+  var myCountry = null;
+  var amReady = false;
+  var countries = [];
+  var currentConnected = 0;
+  var computationStarted = false;
 
-    var myIndex = null, mySize = 0, myT = '1', myProgram = 'surplus_matching_private';
-    var myCountry = null; // "flag|name"
-    var amReady = false;
-    var countries = [];
-
-    // ---- Build the skill sliders ----
-    var skillsList = $('skills-list');
-    SKILLS.forEach(function (s) {
-        var row = document.createElement('div');
-        row.className = 'skill-row';
-        row.innerHTML =
-            '<div class="skill-icon" style="background:' + s.color + '">' +
-            '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + s.icon + '</svg></div>' +
-            '<div class="skill-body">' +
-            '<div class="skill-name">' + s.name + '</div>' +
-            '<div class="skill-desc">' + s.desc + '</div>' +
-            '<div class="skill-slider-row">' +
-            '<input type="range" min="0" max="20" step="1" value="10" id="slider-' + s.id + '">' +
-            '<input type="number" min="0" max="20" step="1" value="10" class="skill-num" id="skill-' + s.id + '">' +
-            '</div></div>';
-        skillsList.appendChild(row);
+  // Construcción de las capacidades (presentación mejorada únicamente).
+  var skillsList = $('skills-list');
+  SKILLS.forEach(function (s) {
+    var row = document.createElement('div');
+    row.className = 'skill-row';
+    row.style.setProperty('--skill-color', s.color);
+    row.style.setProperty('--skill-soft', s.soft);
+    row.innerHTML =
+      '<div class="skill-icon" aria-hidden="true">' +
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' + s.icon + '</svg></div>' +
+      '<div class="skill-meta"><div class="skill-name">' + s.name + '</div><div class="skill-desc">' + s.desc + '</div></div>' +
+      '<div class="skill-slider-row"><div class="slider-wrap">' +
+      '<input type="range" min="0" max="20" step="1" value="10" id="slider-' + s.id + '" aria-label="' + s.name + '">' +
+      '<div class="slider-ruler"><span>0</span><span class="ideal">10</span><span>20</span></div>' +
+      '</div></div>' +
+      '<input type="number" min="0" max="20" step="1" value="10" class="skill-num" id="skill-' + s.id + '" aria-label="Valor de ' + s.name + '">';
+    skillsList.appendChild(row);
+  });
+  SKILLS.forEach(function (s) {
+    var slider = $('slider-' + s.id), num = $('skill-' + s.id);
+    function paint() { slider.style.setProperty('--progress', (Number(slider.value) / 20 * 100) + '%'); }
+    slider.addEventListener('input', function () { num.value = slider.value; paint(); });
+    num.addEventListener('input', function () {
+      if (num.value === '') return;
+      var v = Math.max(0, Math.min(20, parseInt(num.value, 10) || 0));
+      slider.value = v; paint();
     });
-    SKILLS.forEach(function (s) {
-        var slider = $('slider-' + s.id), num = $('skill-' + s.id);
-        slider.addEventListener('input', function () { num.value = slider.value; });
-        num.addEventListener('input', function () {
-            var v = Math.max(0, Math.min(20, parseInt(num.value, 10) || 0));
-            slider.value = v;
-        });
+    num.addEventListener('change', function () {
+      var v = Math.max(0, Math.min(20, parseInt(num.value, 10) || 0));
+      num.value = v; slider.value = v; paint();
     });
+    paint();
+  });
 
-    function showError(msg) {
-        var box = $('lobby-error');
-        if (!msg) { box.className = 'error-box'; box.textContent = ''; return; }
-        box.className = 'error-box show';
-        box.textContent = msg;
+  function showError(msg) {
+    var box = $('lobby-error');
+    if (!msg) { box.className = 'error-box'; box.textContent = ''; return; }
+    box.className = 'error-box show';
+    box.textContent = msg;
+  }
+  function setStep(n, state) {
+    var el = document.querySelector('.s-item[data-step="' + n + '"]');
+    if (!el) return;
+    el.classList.remove('done', 'active');
+    if (state) el.classList.add(state);
+  }
+  function flagOf(c) { return c ? String(c).split('|')[0] : '⚑'; }
+  function nameOf(c) { return c ? String(c).split('|')[1] : 'Sin asignar'; }
+  function updateConnection(connected) {
+    $('connection-pill').classList.toggle('is-offline', !connected);
+    $('connection-label').textContent = connected ? 'Conexión segura' : 'Sin conexión';
+  }
+  function updateCount(connected, size) {
+    currentConnected = Number(connected) || 0;
+    var n = Number(size) || 4;
+    $('connected-count').textContent = currentConnected;
+    $('session-size').textContent = '/ ' + n + ' conectados';
+    $('step2-sub').textContent = currentConnected + '/' + n + ' conectados';
+    var track = $('count-track');
+    track.innerHTML = '';
+    for (var i = 0; i < n; i++) {
+      var segment = document.createElement('span');
+      if (i < currentConnected) segment.className = 'connected';
+      track.appendChild(segment);
     }
+  }
+  updateCount(0, 4);
 
-    function setStep(n, state) {
-        var el = document.querySelector('.s-item[data-step="' + n + '"]');
-        el.classList.remove('done', 'active');
-        if (state) el.classList.add(state);
+  function renderSeats() {
+    var mini = $('seats-mini'); mini.innerHTML = '';
+    for (var i = 0; i < mySize; i++) {
+      var chip = document.createElement('div');
+      chip.className = 'seat-chip' + (i === myIndex ? ' me' : '');
+      var flag = document.createElement('span');
+      flag.className = 'flag';
+      flag.textContent = flagOf(countries[i]);
+      chip.appendChild(flag);
+      chip.appendChild(document.createTextNode(' P' + i + (i === myIndex ? ' · tú' : '')));
+      mini.appendChild(chip);
     }
+  }
 
-    function flagOf(c) { return c ? c.split('|')[0] : '🏳️'; }
-    function nameOf(c) { return c ? c.split('|')[1] : 'Sin asignar'; }
+  function adjustCountrySelectWidth() {
+    var select = $('country-select');
+    var selected = select.options[select.selectedIndex];
+    if (!selected) return;
+    var canvas = adjustCountrySelectWidth.canvas ||
+      (adjustCountrySelectWidth.canvas = document.createElement('canvas'));
+    var ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    var style = window.getComputedStyle(select);
+    ctx.font = style.fontWeight + ' ' + style.fontSize + ' ' + style.fontFamily;
+    select.style.width = Math.min(175, Math.max(57, Math.ceil(ctx.measureText(selected.textContent).width) + 7)) + 'px';
+  }
+  $('country-select').addEventListener('change', function () {
+    myCountry = this.value || null;
+    updateCountryUI();
+    if (myIndex !== null && ws.readyState === WebSocket.OPEN)
+      ws.send(JSON.stringify({ type:'lobby_set_country', country:myCountry }));
+  });
+  function updateCountryUI() {
+    $('my-flag').textContent = flagOf(myCountry);
+    $('side-flag').textContent = flagOf(myCountry);
+    $('side-country').textContent = nameOf(myCountry);
+    $('country-select').value = myCountry || '';
+    adjustCountrySelectWidth();
+  }
+  adjustCountrySelectWidth();
 
-    function renderSeats() {
-        var mini = $('seats-mini');
-        mini.innerHTML = '';
-        for (var i = 0; i < mySize; i++) {
-            var chip = document.createElement('div');
-            chip.className = 'seat-chip' + (i === myIndex ? ' me' : '');
-            chip.innerHTML = '<span class="flag">' + flagOf(countries[i]) + '</span> P' + i;
-            mini.appendChild(chip);
+  // WebSocket signaling y lobby. Se mantienen los mensajes de la demo original.
+  // La página debe cargarse mediante https://localhost:8000/atlas-lobby.html,
+  // NO abriendo el archivo directamente con file://.
+  if (window.location.protocol === 'file:') {
+    showError('Abre la demo desde https://localhost:8000/atlas-lobby.html después de iniciar bash run-servers.sh. No funciona con file://.');
+  }
+  var ws = window.location.hostname ? new WebSocket('wss://' + window.location.hostname + ':8080') : null;
+  if (ws) {
+  ws.addEventListener('open', function () {
+    updateConnection(true);
+    ws.send(JSON.stringify({ type:'lobby_join', room:room, size:4, t:'1', program:'surplus_matching_private' }));
+  });
+  ws.addEventListener('error', function () {
+    updateConnection(false);
+    showError('No se pudo conectar al servidor de señalización en wss://' + window.location.hostname + ':8080. Revisa los servidores y acepta el certificado del puerto 8080.');
+  });
+  ws.addEventListener('close', function () {
+    updateConnection(false);
+    if (!computationStarted) {
+      $('ready-btn').disabled = true;
+      showError('Se perdió la conexión con la sala. Actualiza la página cuando los servidores estén disponibles.');
+    }
+  });
+  ws.addEventListener('message', function (ev) {
+    var data;
+    try { data = JSON.parse(ev.data); } catch (e) { return; }
+    switch (data.type) {
+      case 'lobby_assigned':
+        myIndex = data.index;
+        mySize = data.size;
+        myT = data.t;
+        myProgram = data.program;
+        countries = data.countries || [];
+        $('my-seat-label').textContent = '(P' + myIndex + ')';
+        $('side-seat').textContent = 'P' + myIndex + ' (Tú)';
+        $('ready-btn').disabled = false;
+        $('ready-hint').textContent = 'Completa tus capacidades y pulsa guardar.';
+        showError(null);
+        renderSeats();
+        updateCount(1, mySize);
+        if (myCountry && ws.readyState === WebSocket.OPEN)
+          ws.send(JSON.stringify({type:'lobby_set_country',country:myCountry}));
+        break;
+      case 'lobby_status':
+        if (mySize === 0) mySize = data.size;
+        countries = data.countries || countries;
+        renderSeats();
+        updateCount(data.connected, data.size);
+        if (amReady) {
+          if (data.connected >= data.size) setStep(2, 'done');
+          else setStep(2, 'active');
         }
+        break;
+      case 'lobby_error':
+        showError(data.message);
+        break;
+      case 'lobby_start':
+        startCompute(data.size, data.t, data.program);
+        break;
     }
+  });
+  } // Fin de los eventos WebSocket (omitir en vista previa file://).
 
-    // ---- Country selection ----
-    $('country-select').addEventListener('change', function () {
-        myCountry = this.value || null;
-        updateCountryUI();
-        if (myIndex !== null) ws.send(JSON.stringify({ type: 'lobby_set_country', country: myCountry }));
-    });
-
-    function updateCountryUI() {
-        $('my-flag').textContent = flagOf(myCountry);
-        $('side-flag').textContent = flagOf(myCountry);
-        $('side-country').textContent = nameOf(myCountry);
-        $('country-select').value = myCountry || '';
-    }
-
-    // ---- WebSocket lobby protocol ----
-    var ws = new WebSocket('wss://' + window.location.hostname + ':8080');
-
-    ws.addEventListener('open', function () {
-        ws.send(JSON.stringify({ type: 'lobby_join', room: room, size: 4, t: '1', program: 'surplus_matching_private' }));
-    });
-    ws.addEventListener('error', function () {
-        showError('No se pudo conectar al servidor de señalización en wss://' + window.location.hostname + ':8080 — ¿está corriendo?');
-    });
-
-    ws.addEventListener('message', function (ev) {
-        var data;
-        try { data = JSON.parse(ev.data); } catch (e) { return; }
-
-        switch (data.type) {
-            case 'lobby_assigned':
-                myIndex = data.index;
-                mySize = data.size;
-                myT = data.t;
-                myProgram = data.program;
-                countries = data.countries || [];
-                $('my-seat-label').textContent = '(P' + myIndex + ')';
-                $('side-seat').textContent = 'P' + myIndex + ' (Tú)';
-                $('ready-btn').disabled = false;
-                $('ready-hint').textContent = 'Completa tus capacidades y pulsa guardar.';
-                showError(null);
-                renderSeats();
-                $('step2-sub').textContent = '1/' + mySize + ' conectados';
-                break;
-
-            case 'lobby_status':
-                if (mySize === 0) mySize = data.size;
-                countries = data.countries || countries;
-                renderSeats();
-                $('step2-sub').textContent = data.connected + '/' + data.size + ' conectados';
-                if (data.connected >= data.size) setStep(2, 'done'); else setStep(2, 'active');
-                break;
-
-            case 'lobby_error':
-                showError(data.message);
-                break;
-
-            case 'lobby_start':
-                startCompute(data.size, data.t, data.program);
-                break;
+  $('ready-btn').addEventListener('click', function () {
+    if (!amReady) {
+      var values = [];
+      for (var i = 0; i < SKILLS.length; i++) {
+        var raw = $('skill-' + i).value;
+        var n = Number(raw);
+        if (raw.trim() === '' || !Number.isInteger(n) || n < 0 || n > 20) {
+          showError('Completa las ' + SKILLS.length + ' capacidades con números enteros entre 0 y 20.');
+          return;
         }
+        values.push(n);
+      }
+      showError(null);
+      window.__mySkillValues = values; // En memoria local; no se envían por lobby WebSocket.
+      amReady = true;
+      $('ready-btn').textContent = 'Cancelar participación';
+      $('ready-btn').classList.add('is-ready');
+      $('ready-hint').textContent = 'Esperando a los demás países…';
+      setStep(1, 'done');
+      setStep(2, 'active');
+      SKILLS.forEach(function (s) { $('skill-' + s.id).disabled = true; $('slider-' + s.id).disabled = true; });
+    } else {
+      amReady = false;
+      $('ready-btn').textContent = 'Guardar y participar';
+      $('ready-btn').classList.remove('is-ready');
+      $('ready-hint').textContent = 'Completa tus capacidades y pulsa guardar.';
+      setStep(1, 'active'); setStep(2, null); setStep(3, null);
+      SKILLS.forEach(function (s) { $('skill-' + s.id).disabled = false; $('slider-' + s.id).disabled = false; });
+    }
+    if (ws.readyState === WebSocket.OPEN)
+      ws.send(JSON.stringify({ type:'lobby_ready', ready:amReady }));
+  });
+
+  // Resultado MPC: se conserva el marcador PARTNER CODE del programa existente.
+  function onOut(line) {
+    var m = /PARTNER CODE\s*=\s*(-?\d+)/i.exec(line);
+    if (m) showResult(parseInt(m[1], 10));
+  }
+  function onErr(line) {
+    var log = $('output');
+    log.value += line + '\n';
+    log.scrollTop = log.scrollHeight;
+  }
+  function fail() {
+    $('spinner').hidden = true;
+    $('result-kicker').textContent = 'El cálculo se detuvo con un error.';
+    $('result-sub').textContent = 'Revisa los detalles técnicos abajo.';
+  }
+  function showResult(code) {
+    setStep(3, 'done'); setStep(4, 'done');
+    $('spinner').hidden = true;
+    var v = $('result-value'); v.hidden = false;
+    var partner = countries[code];
+    if (code === -1) {
+      v.className = 'value none';
+      v.textContent = 'Sin coincidencia';
+      $('result-kicker').textContent = 'País recomendado';
+      $('result-sub').textContent = 'No se encontró un aliado útil con las capacidades ingresadas.';
+    } else {
+      v.className = 'value ok';
+      v.textContent = (partner ? flagOf(partner) + ' ' : '') + 'P' + code;
+      $('result-kicker').textContent = 'País recomendado · Mejor complemento';
+      $('result-sub').textContent = 'Este país puede complementar tus capacidades actuales.' + (partner ? ' (' + nameOf(partner) + ')' : '');
+    }
+    drawRelationBoard(code);
+    drawRecap();
+  }
+  function drawRelationBoard(matchIndex) {
+    var board = $('relation-board'); board.innerHTML = '';
+    var positions;
+    if (mySize === 4) {
+      positions = [{x:22,y:30},{x:55,y:18},{x:40,y:72},{x:80,y:48}];
+    } else {
+      positions = [];
+      for (var p = 0; p < mySize; p++) {
+        var angle = -Math.PI / 2 + 2*Math.PI*p/mySize;
+        positions.push({x:50+37*Math.cos(angle),y:50+34*Math.sin(angle)});
+      }
+    }
+    var svgNS = 'http://www.w3.org/2000/svg';
+    var svg = document.createElementNS(svgNS, 'svg');
+    svg.setAttribute('class','relation-line');
+    svg.setAttribute('width','100%'); svg.setAttribute('height','100%');
+    svg.style.position = 'absolute'; svg.style.inset='0';
+    if (matchIndex !== null && matchIndex !== -1 && positions[myIndex] && positions[matchIndex]) {
+      var a = positions[myIndex], b = positions[matchIndex];
+      var line = document.createElementNS(svgNS,'line');
+      line.setAttribute('x1',a.x+'%'); line.setAttribute('y1',a.y+'%');
+      line.setAttribute('x2',b.x+'%'); line.setAttribute('y2',b.y+'%');
+      line.setAttribute('stroke','#169e89'); line.setAttribute('stroke-width','2.5');
+      line.setAttribute('stroke-dasharray','6 6'); svg.appendChild(line);
+    }
+    board.appendChild(svg);
+    for (var i = 0; i < mySize; i++) {
+      var node = document.createElement('div');
+      node.className = 'relation-node' + (i === myIndex ? ' me' : '') + (i === matchIndex ? ' match' : '');
+      node.style.left = positions[i].x + '%'; node.style.top = positions[i].y + '%';
+      var bubble = document.createElement('div'); bubble.className='bubble'; bubble.textContent=flagOf(countries[i]);
+      var label = document.createElement('div'); label.className='node-label'; label.textContent='P'+i+(i===myIndex?' (Tú)':'');
+      node.appendChild(bubble); node.appendChild(label); board.appendChild(node);
+    }
+  }
+  function drawRecap() {
+    var grid = $('recap-grid'); grid.innerHTML='';
+    SKILLS.forEach(function (s, i) {
+      var cell=document.createElement('div'); cell.className='recap-cell';
+      var val=document.createElement('div'); val.className='v'; val.textContent=window.__mySkillValues[i];
+      var label=document.createElement('div'); label.className='l'; label.textContent=s.name;
+      cell.appendChild(val); cell.appendChild(label); grid.appendChild(cell);
     });
+  }
 
-    // ---- Ready button ----
-    $('ready-btn').addEventListener('click', function () {
-        if (!amReady) {
-            var values = [];
-            for (var i = 0; i < 4; i++) {
-                var n = parseInt($('skill-' + i).value, 10);
-                if (isNaN(n)) { showError('Completa las 4 capacidades con números.'); return; }
-                values.push(n);
-            }
-            showError(null);
-            window.__mySkillValues = values; // stays in memory only, never sent over ws
-            amReady = true;
-            $('ready-btn').textContent = 'Cancelar';
-            $('ready-btn').classList.add('is-ready');
-            $('ready-hint').textContent = 'Esperando a los demás países…';
-            setStep(1, 'done');
-            setStep(3, 'active');
-            SKILLS.forEach(function (s) { $('skill-' + s.id).disabled = true; $('slider-' + s.id).disabled = true; });
-        } else {
-            amReady = false;
-            $('ready-btn').textContent = 'Guardar y participar';
-            $('ready-btn').classList.remove('is-ready');
-            $('ready-hint').textContent = 'Completa tus capacidades y pulsa guardar.';
-            setStep(1, null);
-            setStep(3, null);
-            SKILLS.forEach(function (s) { $('skill-' + s.id).disabled = false; $('slider-' + s.id).disabled = false; });
-        }
-        ws.send(JSON.stringify({ type: 'lobby_ready', ready: amReady }));
-    });
-
-    // ---- Compute: load atlas-party.js and start this party ----
-    function onOut(line) {
-        var m = /PARTNER CODE\s*=\s*(-?\d+)/i.exec(line);
-        if (m) showResult(parseInt(m[1], 10));
-    }
-    function onErr(line) {
-        var log = $('output');
-        log.value += line + '\n';
-        log.scrollTop = log.scrollHeight;
-    }
-    function fail() {
-        $('spinner').hidden = true;
-        $('result-kicker').textContent = 'El cálculo se detuvo con un error.';
-        $('result-sub').textContent = 'Revisa los detalles técnicos abajo.';
-    }
-
-    function showResult(code) {
-        setStep(3, 'done');
-        setStep(4, 'done');
-        $('spinner').hidden = true;
-        var v = $('result-value');
-        v.hidden = false;
-        var partner = countries[code];
-        if (code === -1) {
-            v.className = 'value none';
-            v.textContent = 'Sin coincidencia';
-            $('result-kicker').innerHTML = 'País recomendado';
-            $('result-sub').textContent = 'No se encontró un aliado útil con las capacidades ingresadas.';
-        } else {
-            v.className = 'value ok';
-            v.innerHTML = (partner ? flagOf(partner) + ' ' : '') + 'P' + code;
-            $('result-kicker').innerHTML = 'País recomendado <span class="badge-complement">Mejor complemento</span>';
-            $('result-sub').textContent = 'Este país puede complementar tus capacidades actuales.' + (partner ? ' (' + nameOf(partner) + ')' : '');
-        }
-        drawRelationBoard(code);
-        drawRecap();
-    }
-
-    function drawRelationBoard(matchIndex) {
-        var board = $('relation-board');
-        board.innerHTML = '';
-        var positions = [
-            { x: 22, y: 30 }, { x: 55, y: 18 }, { x: 40, y: 72 }, { x: 80, y: 48 }
-        ];
-        var svgNS = 'http://www.w3.org/2000/svg';
-        var svg = document.createElementNS(svgNS, 'svg');
-        svg.setAttribute('class', 'relation-line');
-        svg.setAttribute('width', '100%'); svg.setAttribute('height', '100%');
-        svg.style.position = 'absolute'; svg.style.inset = '0';
-        if (matchIndex !== null && matchIndex !== -1) {
-            var a = positions[myIndex], b = positions[matchIndex];
-            var line = document.createElementNS(svgNS, 'line');
-            line.setAttribute('x1', a.x + '%'); line.setAttribute('y1', a.y + '%');
-            line.setAttribute('x2', b.x + '%'); line.setAttribute('y2', b.y + '%');
-            line.setAttribute('stroke', '#14a38b'); line.setAttribute('stroke-width', '2.5');
-            line.setAttribute('stroke-dasharray', '6 6');
-            svg.appendChild(line);
-        }
-        board.appendChild(svg);
-
-        for (var i = 0; i < mySize; i++) {
-            var node = document.createElement('div');
-            node.className = 'relation-node' + (i === myIndex ? ' me' : '') + (i === matchIndex ? ' match' : '');
-            node.style.left = positions[i].x + '%';
-            node.style.top = positions[i].y + '%';
-            node.innerHTML =
-                '<div class="bubble">' + flagOf(countries[i]) + '</div>' +
-                '<div class="node-label">P' + i + (i === myIndex ? ' (Tú)' : '') + '</div>';
-            board.appendChild(node);
-        }
-    }
-
-    function drawRecap() {
-        var grid = $('recap-grid');
-        grid.innerHTML = '';
-        SKILLS.forEach(function (s, i) {
-            var cell = document.createElement('div');
-            cell.className = 'recap-cell';
-            cell.innerHTML = '<div class="v">' + window.__mySkillValues[i] + '</div><div class="l">' + s.name + '</div>';
-            grid.appendChild(cell);
-        });
-    }
-
-    function startCompute(size, t, program) {
-        $('view-skills').hidden = true;
-        $('view-result').hidden = false;
-        $('page-title').textContent = 'Resultado privado';
-        $('page-sub').textContent = 'Este resultado fue calculado de forma segura y solo tú puedes verlo.';
-        setStep(2, 'done');
-
-        var outputElement = $('output');
-        var statusElement = $('status');
-
-        window.Module = {
-            noInitialRun: true,
-            print: (function () {
-                outputElement.value = '';
-                return function () {
-                    var line = Array.prototype.slice.call(arguments).join(' ');
-                    console.log(line);
-                    outputElement.value += line + '\n';
-                    outputElement.scrollTop = outputElement.scrollHeight;
-                    try { onOut(line); } catch (e) {}
-                };
-            })(),
-            printErr: function () {
-                var line = Array.prototype.slice.call(arguments).join(' ');
-                console.error(line);
-                try { onErr(line); } catch (e) {}
-            },
-            setStatus: function (text) {
-                if (!Module.setStatus.last) Module.setStatus.last = { time: Date.now(), text: '' };
-                if (text !== Module.setStatus.last.text) {
-                    Module.setStatus.last.time = Date.now();
-                    Module.setStatus.last.text = text;
-                    statusElement.textContent = text;
-                }
-            },
-            totalDependencies: 0,
-            monitorRunDependencies: function (left) {
-                Module.totalDependencies = Math.max(Module.totalDependencies, left);
-                Module.setStatus(left ? 'Preparando... (' + (Module.totalDependencies - left) + '/' + Module.totalDependencies + ')' : 'Descarga completa.');
-            }
+  function startCompute(size,t,program) {
+    if (computationStarted) return;
+    computationStarted=true;
+    $('view-skills').hidden=true; $('view-result').hidden=false;
+    $('page-sub').textContent='El resultado de la evaluación privada aparecerá al finalizar el protocolo.';
+    setStep(2,'done'); setStep(3,'active');
+    var outputElement=$('output'), statusElement=$('status');
+    window.Module={
+      noInitialRun:true,
+      print:(function(){
+        outputElement.value='';
+        return function(){
+          var line=Array.prototype.slice.call(arguments).join(' ');
+          console.log(line);
+          outputElement.value+=line+'\n'; outputElement.scrollTop=outputElement.scrollHeight;
+          try {onOut(line);} catch(e){console.error(e);}
         };
-        window.Module.setStatus('Descargando runtime...');
-        window.onerror = function () {
-            try { fail(); } catch (e) {}
-            window.Module.setStatus = function (t) { if (t) console.error('[post-exception status] ' + t); };
-        };
-
-        var script = document.createElement('script');
-        script.src = 'atlas-party.js';
-        script.async = true;
-        script.onload = function () {
-            // -ss defaults to localhost:8080, which only works when every party
-            // runs on the server machine; point it at the host that served this
-            // page so parties on other devices on the LAN reach the same server.
-            var args = ['-N', String(size), '-T', String(t), '-w', '0', String(myIndex),
-                        '-ss', window.location.hostname + ':8080', program, '-OF', '.'];
-            var inputText = window.__mySkillValues.join('\n') + '\n';
-            var inputFiles = {};
-            inputFiles['Player-Data/Input-P' + myIndex + '-0'] = inputText;
-
-            (function waitForHook() {
-                if (typeof window.webSPDZStartParty === 'function') {
-                    window.webSPDZStartParty(args, inputFiles);
-                } else {
-                    setTimeout(waitForHook, 20);
-                }
-            })();
-        };
-        document.body.appendChild(script);
-    }
+      })(),
+      printErr:function(){
+        var line=Array.prototype.slice.call(arguments).join(' ');
+        console.error('[ATLAS ERROR]',line);
+        outputElement.value+='[ERROR] '+line+'\n'; outputElement.scrollTop=outputElement.scrollHeight;
+        // Al registrar arriba no se llama a onErr para evitar logs duplicados.
+      },
+      setStatus:function(text){
+        if(!Module.setStatus.last) Module.setStatus.last={time:Date.now(),text:''};
+        if(text!==Module.setStatus.last.text){
+          Module.setStatus.last.time=Date.now(); Module.setStatus.last.text=text;
+          statusElement.textContent=text;
+        }
+      },
+      totalDependencies:0,
+      monitorRunDependencies:function(left){
+        Module.totalDependencies=Math.max(Module.totalDependencies,left);
+        Module.setStatus(left?'Preparando... ('+(Module.totalDependencies-left)+'/'+Module.totalDependencies+')':'Descarga completa.');
+      }
+    };
+    window.Module.setStatus('Descargando runtime...');
+    window.onerror=function(message,source,lineno,colno,error){
+      var details='Mensaje: '+message+'\nArchivo: '+source+'\nLínea: '+lineno+'\nColumna: '+colno+'\nStack: '+(error&&error.stack?error.stack:'No disponible');
+      console.error('[ATLAS GLOBAL ERROR]\n'+details);
+      outputElement.value+='\n[GLOBAL ERROR]\n'+details+'\n';
+      try{fail();}catch(e){console.error(e);}
+      window.Module.setStatus=function(t){if(t) console.error('[post-exception status] '+t);};
+    };
+    var script=document.createElement('script');
+    script.src='atlas-party.js'; script.async=true;
+    script.onerror=function(){
+      outputElement.value+='\n[ERROR] No se pudo cargar atlas-party.js\n';fail();
+    };
+    script.onload=function(){
+      // EXACTAMENTE el mismo formato de argumentos y Player-Data que en el HTML original.
+      var args=['-N',String(size),'-T',String(t),'-w','0',String(myIndex),
+                '-ss',window.location.hostname+':8080',program,'-OF','.'];
+      var inputText=window.__mySkillValues.join('\n')+'\n';
+      var inputFiles={}; inputFiles['Player-Data/Input-P'+myIndex+'-0']=inputText;
+      (function waitForHook(){
+        if(typeof window.webSPDZStartParty==='function'){
+          console.log('[MPC DEBUG] Party:',myIndex);
+          console.log('[MPC DEBUG] Input count:',window.__mySkillValues.length);
+          window.webSPDZStartParty(args,inputFiles);
+        } else {setTimeout(waitForHook,20);}
+      })();
+    };
+    document.body.appendChild(script);
+  }
+})();
+</script>
+<script>
+/* Presentación únicamente: abrir/cerrar sidebar. */
+(function(){
+  var sidebar=document.getElementById('surplus-sidebar');
+  var toggle=document.getElementById('surplus-menu-toggle');
+  if(!sidebar||!toggle)return;
+  function setOpen(open){
+    sidebar.classList.toggle('expanded',open);
+    toggle.setAttribute('aria-expanded',String(open));
+    toggle.setAttribute('aria-label',open?'Cerrar menú':'Abrir menú');
+    toggle.title=open?'Cerrar menú':'Abrir menú';
+  }
+  toggle.addEventListener('click',function(){setOpen(!sidebar.classList.contains('expanded'));});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')setOpen(false);});
+  document.addEventListener('click',function(e){if(window.innerWidth<=720&&sidebar.classList.contains('expanded')&&!sidebar.contains(e.target))setOpen(false);});
 })();
 </script>
 </body>

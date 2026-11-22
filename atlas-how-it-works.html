@@ -1,290 +1,943 @@
 <!doctype html>
 <html lang="es">
 <head>
-    <meta charset="utf-8">
-    <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Surplus · Cómo funciona</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg: #f3f4fb;
-            --surface: #ffffff;
-            --surface-2: #f3f4fb;
-            --border: #e5e6f2;
-            --text: #171933;
-            --muted: #6b7088;
-            --accent: #5b5bd6;
-            --accent-2: #14a38b;
-            --accent-soft: #eef0fd;
-            --danger: #d64545;
-            --sidebar-bg: #12142a;
-            --sidebar-text: #c9cbe0;
-            --sidebar-active: #5b5bd6;
-            --shadow: 0 1px 2px rgba(23, 25, 51, 0.04), 0 10px 28px rgba(23, 25, 51, 0.06);
-        }
-        * { box-sizing: border-box; }
-        body {
-            margin: 0; min-height: 100vh;
-            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-            color: var(--text); background: var(--bg); -webkit-font-smoothing: antialiased;
-        }
-        .app { display: flex; min-height: 100vh; }
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#151a38">
+  <title>RAMC · Cómo funciona</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    /* ============================================================
+       RAMC / ATLAS — AESTHETIC UI
+       Solo presentación: el protocolo, la sala, el número de
+       participantes y la ejecución de atlas-party.js se conservan.
+       ============================================================ */
+    :root {
+      --bg: #f8f6ff;
+      --surface: #ffffff;
+      --surface-2: #f7f4ff;
+      --ink: #171b40;
+      --muted: #777b9b;
+      --border: #e8e3f4;
+      --purple: #6753d9;
+      --purple-dark: #5436bc;
+      --purple-light: #b48bfa;
+      --purple-soft: #f0e9ff;
+      --teal: #0c9d86;
+      --teal-soft: #e6f8f3;
+      --danger: #be475d;
+      --sidebar: #171d3e;
+      --shadow: 0 10px 34px rgba(48, 40, 113, .055), 0 2px 9px rgba(48, 40, 113, .028);
+      --radius: 24px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "DM Sans", "Inter", system-ui, -apple-system, sans-serif;
+      font-size: 14px;
+      -webkit-font-smoothing: antialiased;
+    }
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+    button:disabled { cursor: not-allowed; }
+    button:focus-visible, a:focus-visible, select:focus-visible, input:focus-visible, summary:focus-visible {
+      outline: 3px solid #bca7fa;
+      outline-offset: 3px;
+    }
+    [hidden] { display: none !important; }
+    .app { display: flex; min-height: 100vh; }
 
-        /* ---------- Sidebar (same as atlas-lobby.html) ---------- */
-        .sidebar { width: 240px; flex: none; background: var(--sidebar-bg); color: var(--sidebar-text); display: flex; flex-direction: column; padding: 22px 16px; }
-        .brand { display: flex; align-items: center; gap: 10px; padding: 0 6px 22px; }
-        .brand-mark { width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #fff; flex: none; }
-        .brand-name { font-weight: 800; font-size: 17px; color: #fff; letter-spacing: -.2px; }
-        .brand-sub { font-size: 10.5px; color: #8c8fb5; }
-        nav.nav { display: flex; flex-direction: column; gap: 4px; margin-bottom: 20px; }
-        .nav-item { display: flex; align-items: center; gap: 11px; padding: 10px 12px; border-radius: 12px; color: var(--sidebar-text); cursor: pointer; user-select: none; font-size: 13.5px; font-weight: 600; text-decoration: none; }
-        .nav-item .nav-icon { width: 20px; height: 20px; flex: none; opacity: .85; }
-        .nav-item .nav-hint { display: block; font-size: 10.5px; font-weight: 500; color: #80839f; }
-        .nav-item.active { background: var(--sidebar-active); color: #fff; }
-        .nav-item.active .nav-hint { color: #d9d9ff; }
-        .nav-item.disabled { opacity: .45; cursor: default; }
-        .nav-item.disabled .soon { margin-left: auto; font-size: 9px; font-weight: 700; letter-spacing: .3px; background: rgba(255,255,255,.08); border-radius: 999px; padding: 2px 7px; }
-        .sidebar-globe { flex: 1; min-height: 80px; display: flex; align-items: center; justify-content: center; opacity: .8; }
-        .sidebar-footer { font-size: 11px; color: #9699ba; line-height: 1.5; padding: 0 6px; }
-        .sidebar-footer .tag { font-weight: 700; color: #d7d9f0; }
-        .sidebar-mini-list { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
-        .sidebar-mini-list span { display: flex; align-items: center; gap: 7px; }
-        .sidebar-mini-list i { width: 7px; height: 7px; border-radius: 50%; background: var(--accent-2); flex: none; }
+    /* Sidebar: misma estructura, con dos opciones futuras ocultas. */
+    .sidebar {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      display: flex;
+      flex-direction: column;
+      flex: none;
+      width: 84px;
+      min-width: 84px;
+      height: 100dvh;
+      padding: 17px 12px 22px;
+      overflow: hidden;
+      color: #e2e1f6;
+      background: linear-gradient(165deg, #171e42 0%, #141933 66%, #25204f 100%);
+      border-right: 1px solid rgba(255, 255, 255, .08);
+      transition: width .22s ease, min-width .22s ease;
+    }
+    .sidebar.expanded { width: 244px; min-width: 244px; }
+    .sidebar-toggle {
+      display: grid;
+      place-items: center;
+      width: 54px;
+      height: 52px;
+      margin: 0 auto 19px;
+      padding: 0;
+      flex: none;
+      color: #f7f4ff;
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 16px;
+      background: rgba(255,255,255,.045);
+      transition: background .2s ease;
+    }
+    .sidebar-toggle:hover { background: rgba(255,255,255,.14); }
+    .sidebar.expanded .sidebar-toggle { margin-left: 2px; }
+    .brand { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 25px; }
+    .brand-mark {
+      width: 52px; height: 52px; display: grid; place-items: center; flex: none;
+      border-radius: 16px; color: white;
+      background: linear-gradient(135deg,#6b67ee 0%,#8069df 52%,#32b9b3 100%);
+      box-shadow: 0 10px 22px rgba(76, 67, 201, .18);
+    }
+    .brand-copy, .sidebar-footer { display: none; }
+    .sidebar.expanded .brand { justify-content: flex-start; padding: 0 3px; }
+    .sidebar.expanded .brand-copy { display: block; min-width: 0; }
+    .brand-name { font: 800 16px/1.2 Manrope, sans-serif; letter-spacing: -.45px; color:#fff; }
+    .brand-sub { font-size: 10px; color: #adb0da; padding-top: 4px; }
+    .nav { display: flex; flex-direction: column; gap: 10px; }
+    .nav-item {
+      display: flex; align-items: center; justify-content: center; gap: 14px;
+      min-height: 56px; padding: 12px 14px; border-radius: 16px;
+      text-decoration: none; color: #b7b9d9; transition: background .2s ease, color .2s ease;
+    }
+    .nav-item:hover { color: #fff; background: rgba(255,255,255,.075); }
+    .nav-item.active {
+      color: #fff;
+      background: linear-gradient(135deg, #6e5be2, #8a63e9);
+      box-shadow: 0 7px 20px rgba(110, 91, 226, .22);
+    }
+    .nav-icon { width: 24px; height: 24px; flex: none; }
+    .nav-copy { display: none; min-width: 0; }
+    .nav-title { font-weight: 700; font-size: 13px; }
+    .nav-hint { margin-top: 3px; color: #a7a9cd; font-size: 10px; font-weight: 500; }
+    .active .nav-hint { color: #ebe5ff; }
+    .sidebar.expanded .nav-item { justify-content: flex-start; }
+    .sidebar.expanded .nav-copy { display: block; }
+    .sidebar-spacer { flex: 1; min-height: 36px; }
+    .sidebar-deco { opacity: .56; display: grid; place-items: center; }
+    .sidebar-deco svg { width: 62px; height: 62px; }
+    .sidebar.expanded .sidebar-deco svg { width: 100px; height: 100px; }
+    .sidebar.expanded .sidebar-footer { display:block; margin-top: 14px; color:#abaed5; font-size:11px; line-height:1.6; padding:0 8px; }
 
-        /* ---------- Main ---------- */
-        .main { flex: 1; min-width: 0; padding: 26px 32px 40px; }
-        .topbar { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 22px; flex-wrap: wrap; }
-        .topbar h1 { margin: 0 0 4px; font-size: 25px; font-weight: 800; letter-spacing: -.3px; }
-        .topbar p { margin: 0; color: var(--muted); font-size: 13.5px; max-width: 640px; }
-        .pill { display: flex; align-items: center; gap: 8px; background: var(--surface); border: 1px solid var(--border); border-radius: 999px; padding: 8px 14px; font-size: 12.5px; font-weight: 600; box-shadow: var(--shadow); }
-        .secure-pill { color: var(--accent-2); }
-        .secure-pill small { display: block; font-weight: 500; color: var(--muted); font-size: 10px; }
+    /* Main + quiet violet background */
+    .main {
+      flex: 1;
+      min-width: 0;
+      max-width: 1900px;
+      margin: 0 auto;
+      padding: 0 clamp(22px, 3.2vw, 54px) 56px;
+      position: relative;
+      isolation: isolate;
+    }
+    .main::before {
+      content:"";
+      position:absolute;
+      z-index:-2;
+      inset:0 0 auto 0;
+      height: 440px;
+      pointer-events:none;
+      background:
+        radial-gradient(ellipse 36% 68% at 67% 0%, rgba(145, 126, 240, .24), transparent 74%),
+        radial-gradient(ellipse 45% 85% at 96% 16%, rgba(225, 206, 252, .68), transparent 78%),
+        linear-gradient(180deg, #f7f5ff 0%, rgba(247,245,255,.7) 78%, rgba(247,245,255,0));
+    }
+    .topbar { min-height: 209px; display: flex; align-items: center; position: relative; gap: 18px; padding: 32px 0 29px; }
+    .intro { position: relative; z-index: 2; max-width: 720px; }
+    .eyebrow {
+      width: max-content; display: inline-flex; align-items:center; gap: 9px;
+      padding: 8px 13px; margin-bottom: 17px; border:1px solid #e3d9ff;
+      border-radius: 999px; background: rgba(239, 232, 255, .72);
+      color: #5a39bb; font-size: 11px; font-weight: 800; letter-spacing:.15px;
+    }
+    .eyebrow svg {flex:none;}
+    .topbar h1 { font: 800 clamp(30px, 3vw, 44px)/1.18 Manrope, sans-serif; letter-spacing: -1.9px; margin: 0 0 12px; }
+    .topbar h1 .highlight {
+      color: #7043d5;
+      background: linear-gradient(115deg, #ae63ef, #5935bf);
+      -webkit-background-clip: text; background-clip:text; -webkit-text-fill-color: transparent;
+    }
+    .topbar p { margin: 0; max-width: 630px; font-size: 14px; line-height:1.7; color: #616788; }
+    .top-right { display:flex; align-items:center; flex-wrap:wrap; gap:10px; position:relative; z-index:3; margin-left:auto; align-self:flex-start; margin-top:19px; }
+    .pill {
+      display:flex; align-items:center; gap:8px; min-height:43px;
+      padding: 8px 13px; border: 1px solid rgba(222, 218, 242, .9);
+      border-radius: 999px; background: rgba(255,255,255,.82);
+      box-shadow: 0 4px 16px rgba(79,65,150,.055);
+      backdrop-filter: blur(14px); font-size: 12px; font-weight: 700;
+      white-space:nowrap;
+    }
+    .pill svg, .pill .my-flag { flex:none; }
+    #my-seat-label {white-space:nowrap; font-weight: 800; color:#5d4bad;}
+    .country-select {
+      appearance: none; border:0; outline:0; background:transparent; color:var(--ink);
+      font-size: 12px; font-weight:700; width:105px; max-width:175px; min-width:0;
+      cursor:pointer;
+    }
+    .country-select:focus-visible { outline:2px solid #ae98ec; outline-offset:3px; }
+    .select-chevron { width:13px; opacity:.6; }
+    .secure-pill { color:#087f70; background:#edf9f5; border-color:#d1ece5; }
+    .secure-pill small {display:block; font-size:10px; font-weight:500; color:#678783; margin-top:2px;}
+    .secure-pill.is-offline { color:#856579; background:#f7eff5; border-color:#eedde9; }
+    .hero-globe {
+      position:absolute; z-index:-1; width:360px; height:210px; top:-17px; left:48%;
+      opacity:.48; pointer-events:none; overflow:hidden;
+      filter:drop-shadow(0 0 15px rgba(121,100,218,.16));
+    }
+    .hero-globe svg {width:100%;height:100%;}
 
-        .card { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; box-shadow: var(--shadow); overflow: hidden; margin-bottom: 18px; }
-        .card-pad { padding: 20px 22px; }
+    /* Common surfaces */
+    .columns {display:grid; grid-template-columns:minmax(0,1.46fr) minmax(345px,.94fr); align-items:start; gap:20px;}
+    .left-stack, .right-stack { min-width:0; display:flex; flex-direction:column; gap:18px; }
+    .card {
+      min-width:0; overflow:hidden; border:1px solid rgba(230,224,247,.94);
+      background:rgba(255,255,255,.88); border-radius:var(--radius);
+      box-shadow:var(--shadow); backdrop-filter:blur(12px);
+    }
+    .card-pad {padding:clamp(20px, 2.5vw, 33px);}
+    .card-heading {display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:8px;}
+    .card-title {display:flex; align-items:center; gap:12px; font:800 17px/1.4 Manrope,sans-serif; letter-spacing:-.5px; margin:0;}
+    .step-num {width:33px;height:33px;border-radius:12px;display:grid;place-items:center;flex:none;color:#fff;background:linear-gradient(145deg,#8464ea,#6449d7);font:800 13px Manrope,sans-serif; box-shadow:0 5px 13px rgba(104,75,215,.16);}
+    .ideal-badge {display:inline-flex;align-items:center;gap:7px;padding:8px 12px;border-radius:999px;border:1px solid #e5d8ff;background:#f4edff;color:#6240c2;font-size:12px;font-weight:800;white-space:nowrap;}
+    .card-sub {margin:0 0 13px; color:var(--muted); font-size:12px; line-height:1.7;}
+    .error-box {margin:0 0 18px;padding:13px 17px;border:1px solid #edb8c4;background:#fff3f5;color:#aa3653;border-radius:15px;font-size:12px;display:none;line-height:1.5;}
+    .error-box.show {display:block;}
 
-        /* ---------- Step grid ---------- */
-        .steps-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 18px; align-items: stretch; }
-        @media (max-width: 1100px) { .steps-grid { grid-template-columns: 1fr; } }
-        .step-card { display: flex; flex-direction: column; }
-        .step-head { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
-        .step-badge { width: 26px; height: 26px; border-radius: 50%; flex: none; background: var(--accent); color: #fff; font-size: 13px; font-weight: 700; display: grid; place-items: center; }
-        .step-title { font-size: 14.5px; font-weight: 700; }
-        .step-desc { font-size: 12.5px; color: var(--muted); line-height: 1.55; margin: 0 0 14px; }
-        .step-visual { margin-top: auto; }
+    /* Skills: clear, airy controls with visible ideal threshold */
+    .skill-row {display:grid;grid-template-columns:49px minmax(160px,.9fr) minmax(160px,1.25fr) 68px;gap:14px;align-items:center;padding:19px 0;border-bottom:1px solid #f0ebf7;}
+    .skill-row:last-child {border-bottom:0;}
+    .skill-icon {width:48px;height:48px;display:grid;place-items:center;border-radius:15px;background:var(--skill-soft);color:var(--skill-color);}
+    .skill-icon svg {width:22px;height:22px;stroke:currentColor;}
+    .skill-name {font:800 13px/1.5 Manrope,sans-serif;letter-spacing:-.12px;}
+    .skill-desc {color:var(--muted);font-size:11px;line-height:1.55;margin-top:3px;max-width:215px;}
+    .skill-slider-row {display:flex;align-items:center;gap:0;min-width:0;}
+    .slider-wrap {min-width:0;width:100%;position:relative;}
+    .skill-slider-row input[type="range"] {
+      display:block; width:100%; height:8px; margin: 12px 0 8px;
+      border:0; border-radius:99px; background:linear-gradient(to right, #aa7bf2 0%, #7253e0 var(--progress,50%), #d9d6e7 var(--progress,50%), #d9d6e7 100%);
+      -webkit-appearance:none; appearance:none; outline:0; cursor:pointer;
+    }
+    .skill-slider-row input[type="range"]::-webkit-slider-thumb { -webkit-appearance:none; appearance:none; width:19px;height:19px; border-radius:50%; border:3px solid #7958e5; background:#fff;box-shadow:0 2px 8px rgba(95,63,183,.2);transition:transform .15s;}
+    .skill-slider-row input[type="range"]::-moz-range-thumb { width:15px;height:15px; border-radius:50%; border:3px solid #7958e5; background:#fff;box-shadow:0 2px 8px rgba(95,63,183,.2); }
+    .skill-slider-row input[type="range"]:hover::-webkit-slider-thumb {transform:scale(1.12);}
+    .skill-slider-row input[type="range"]:disabled {opacity:.56;cursor:not-allowed;}
+    .slider-ruler {display:flex;justify-content:space-between;align-items:center;color:#888ba9;font-size:10px;font-weight:700;}
+    .slider-ruler .ideal {color:#7651d7;}
+    .skill-num {width:66px; height:41px; text-align:center; color:var(--ink);font-size:13px;font-weight:800; border:1px solid #e4def0;border-radius:11px;background:#faf8ff;outline:0;}
+    .skill-num:disabled {opacity:.65;}
+    .skill-goal-row {display:flex;justify-content:space-between;align-items:center;gap:10px;padding:15px 32px;background:linear-gradient(90deg,#f9f6ff,#f4efff);border-top:1px solid #eee6ff;font-size:11px;color:#7a76a1;}
+    .skill-goal-row b {color:#6747c3;font-size:12px;}
+    .save-card {background:linear-gradient(115deg,rgba(255,255,255,.94),rgba(252,249,255,.94));}
+    .save-card .card-pad {display:grid;grid-template-columns:minmax(0,1fr) minmax(170px,220px);align-items:center;gap:18px;}
+    .save-card .card-title {font-size:15px;}
+    .save-card .card-sub {margin:5px 0 0;}
+    .save-actions {display:flex;flex-direction:column;align-items:stretch;gap:6px;}
+    button.primary {
+      width:100%;min-height:48px;padding:12px 14px;border:0;border-radius:13px;
+      color:white;font-size:12px;font-weight:800;letter-spacing:.05px;
+      background:linear-gradient(110deg,#7957df,#5f49ca);
+      box-shadow:0 8px 16px rgba(100,70,193,.16);transition:transform .18s,box-shadow .18s;
+    }
+    button.primary:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 10px 21px rgba(100,70,193,.22);}
+    button.primary:disabled {opacity:.48;box-shadow:none;}
+    button.primary.is-ready {background:#f3efff;color:#6446c5;border:1px solid #dfd5fc;box-shadow:none;}
+    .hint-line {text-align:center;margin:0;font-size:10px;color:#8582a2;line-height:1.5;}
 
-        /* mini skill preview (step 1) */
-        .mini-skill { display: flex; align-items: center; gap: 8px; padding: 6px 0; }
-        .mini-skill .ic { width: 22px; height: 22px; border-radius: 6px; flex: none; display: grid; place-items: center; }
-        .mini-skill .bar-track { flex: 1; height: 7px; border-radius: 999px; background: var(--surface-2); overflow: hidden; }
-        .mini-skill .bar-fill { height: 100%; border-radius: 999px; }
-        .mini-skill .val { font-size: 11px; font-weight: 700; color: var(--muted); width: 36px; text-align: right; flex: none; }
-        .lock-note { display: flex; align-items: center; gap: 7px; font-size: 11px; color: var(--muted); margin-top: 10px; padding: 8px 10px; background: var(--surface-2); border-radius: 10px; }
+    /* Right status card */
+    .session-card {padding:25px 24px;}
+    .session-grid {display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:15px;align-items:center;}
+    .session-country {display:flex;gap:12px;align-items:center;min-width:0;}
+    .session-icon {width:43px;height:43px;display:grid;place-items:center;border-radius:14px;background:#f1eaff;flex:none;color:#704bcb;}
+    .my-country-flag {font-size:26px;line-height:1;}
+    .session-label {font-size:10px;color:var(--muted);margin-bottom:5px;}
+    .session-name {font:800 15px/1.4 Manrope,sans-serif;letter-spacing:-.3px;word-break:break-word;}
+    .session-count {padding-left:17px;border-left:1px solid #e8e0f4;}
+    .session-count .count-num {font:800 19px/1.2 Manrope,sans-serif;letter-spacing:-.45px;}
+    .count-num small{font-size:11px;color:var(--muted);font-weight:600;}
+    .count-track {display:flex;gap:4px;margin-top:13px;}
+    .count-track span {height:6px;flex:1;min-width:0;border-radius:999px;background:#dfd9ed;transition:background .2s;}
+    .count-track span.connected {background:linear-gradient(90deg,#8061e5,#b38ff0);}
+    .seats-mini {display:flex;flex-wrap:wrap;gap:7px;margin-top:17px;}
+    .seat-chip {display:inline-flex;align-items:center;gap:6px;padding:6px 8px;border:1px solid #e9e4f3;border-radius:999px;background:#faf8ff;color:#72708e;font-size:10px;font-weight:700;}
+    .seat-chip .flag {font-size:13px;line-height:1;}
+    .seat-chip.me {border-color:#c3a9ff;background:#f1eaff;color:#643ac6;}
 
-        /* mesh diagram (step 2) */
-        .mesh { position: relative; height: 200px; }
-        .mesh-node { position: absolute; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; gap: 3px; }
-        .mesh-node .bubble { width: 40px; height: 40px; border-radius: 50%; background: var(--surface); border: 2px solid var(--accent); display: grid; place-items: center; box-shadow: var(--shadow); }
-        .mesh-node .bubble svg { width: 16px; height: 16px; color: var(--accent); }
-        .mesh-node .mesh-label { font-size: 9.5px; font-weight: 700; color: var(--muted); }
-        .mesh-caption { text-align: center; font-size: 10.5px; color: var(--muted); margin-top: 6px; }
+    /* Deep violet privacy panel: tasteful contrast, no cartoon objects */
+    .privacy-card {position:relative;color:#fff;border:1px solid #8c78c9;background:linear-gradient(127deg,#7861ad 0%,#6550a5 52%,#50438f 100%);}
+    .privacy-card::before,.privacy-card::after {content:"";position:absolute;border:1px solid rgba(235,220,255,.17);border-radius:50%;pointer-events:none;}
+    .privacy-card::before {width:260px;height:260px;right:-114px;top:-171px;}
+    .privacy-card::after {width:240px;height:240px;right:-90px;bottom:-195px;}
+    .privacy-body {display:grid;grid-template-columns:minmax(0,1fr) 92px;gap:10px;align-items:center; padding:26px 27px;}
+    .privacy-card h3 {font:800 17px/1.3 Manrope,sans-serif;letter-spacing:-.4px;margin:0 0 17px;}
+    .privacy-points {display:flex;flex-direction:column;gap:13px;}
+    .privacy-point {display:flex;align-items:flex-start;gap:9px;line-height:1.55;font-size:11.5px;color:#f3ebff;}
+    .privacy-tick {width:20px;height:20px;flex:none;border-radius:50%;display:grid;place-items:center;color:#fff;background:rgba(216,197,255,.25);font-size:12px;font-weight:800;margin-top:0;}
+    .privacy-graphic {display:grid;place-items:center;color:#e8d9ff;opacity:.9;}
+    .privacy-graphic svg {width:87px;height:100px;}
 
-        /* result preview (step 3) */
-        .mini-result { text-align: center; padding: 8px 0; }
-        .mini-result .flag { font-size: 30px; }
-        .mini-result .who { font-size: 15px; font-weight: 800; margin-top: 4px; }
-        .mini-result .note { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    /* Right process stepper */
+    .progress-card .card-pad {padding:25px 26px 26px;}
+    .progress-card .card-title {margin-bottom:15px;}
+    .stepper {display:flex;flex-direction:column;}
+    .s-item {display:flex;gap:12px;align-items:flex-start;position:relative;padding:10px 0;}
+    .s-item:not(:last-child)::before {content:"";position:absolute;top:37px;bottom:-8px;left:13px;width:2px;background:#ebe4f6;}
+    .s-dot {position:relative;z-index:1;display:grid;place-items:center;flex:none;width:27px;height:27px;border:1px solid #ddd5ee;border-radius:50%;background:#f5f2fb;color:#8a82a8;font:800 11px Manrope,sans-serif;}
+    .s-item.done .s-dot {background:#159986;border-color:#159986;color:#fff;}
+    .s-item.active .s-dot {color:#fff;background:linear-gradient(135deg,#8460e7,#593cca);border-color:#7456d8;box-shadow:0 3px 11px rgba(117,83,223,.2);}
+    .s-text {flex:1;min-width:0;padding-top:3px;}
+    .s-text b {display:block;font-size:11.5px;font-weight:800;line-height:1.45;}
+    .s-text span {display:block;color:#8983a2;font-size:10.5px;line-height:1.5;margin-top:3px;}
+    .s-item.active .s-text {background:#f2edff;border-radius:13px;padding:10px 12px;margin-top:-8px;}
 
-        /* step 4 + privacy */
-        .bottom-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-        @media (max-width: 900px) { .bottom-grid { grid-template-columns: 1fr; } }
-        .soon-tag { font-size: 9.5px; font-weight: 700; letter-spacing: .3px; color: var(--accent); background: var(--accent-soft); border-radius: 999px; padding: 3px 9px; }
-        .handshake-row { display: flex; align-items: center; justify-content: center; gap: 18px; padding: 18px 0 8px; }
-        .handshake-row .flag-circle { width: 46px; height: 46px; border-radius: 50%; background: var(--surface-2); display: grid; place-items: center; font-size: 22px; border: 1px solid var(--border); }
-        .handshake-row svg { color: var(--accent); }
+    /* Result view; IDs are kept for the original protocol. */
+    .result-headline {text-align:center;padding:12px 0;}
+    .result-headline .kicker {font-size:11px;color:var(--muted);margin-bottom:8px;}
+    .result-headline .value {font:800 clamp(34px,4vw,53px)/1.2 Manrope,sans-serif;letter-spacing:-1px;overflow-wrap:anywhere;}
+    .result-headline .value.ok {color:#6445c5;}
+    .result-headline .value.none {color:var(--danger);font-size:26px;}
+    .result-headline .sub {color:var(--muted);font-size:12px;margin-top:9px;line-height:1.6;}
+    .badge-complement {display:inline-flex;margin-left:7px;padding:4px 9px;border-radius:999px;background:#eee7ff;color:#6c42c6;font-size:10px;font-weight:700;vertical-align:middle;}
+    .spinner {width:38px;height:38px;margin:14px auto;border-radius:50%;border:3px solid #eee8fb;border-top-color:var(--purple);animation:spin .9s linear infinite;}
+    @keyframes spin {to{transform:rotate(360deg)}}
+    .relation-board {position:relative;height:370px;overflow:hidden;border:1px solid #e6def6;border-radius:17px;background:radial-gradient(circle at 50% 46%,rgba(163,132,240,.15),transparent 53%),linear-gradient(135deg,#faf8ff,#f3f1fa);}
+    .relation-node {position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:5px;}
+    .relation-node .bubble {width:57px;height:57px;display:grid;place-items:center;background:#fff;border:2px solid #e5daf9;border-radius:50%;font-size:25px;box-shadow:0 8px 18px rgba(73,51,147,.09);}
+    .relation-node.me .bubble {border-color:#7156d8;}
+    .relation-node.match .bubble {border-color:#1aa692;box-shadow:0 0 0 5px rgba(26,166,146,.1);}
+    .relation-node .node-label {padding:3px 8px;border-radius:999px;border:1px solid #e9e1f7;background:#fff;font-size:10px;font-weight:800;white-space:nowrap;}
+    .relation-line {position:absolute;pointer-events:none;}
+    .recap-grid {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:15px;}
+    .recap-cell {padding:14px 7px;text-align:center;background:#f7f3ff;border:1px solid #e9e0fb;border-radius:13px;}
+    .recap-cell .v {font:800 22px Manrope,sans-serif;color:#6244c1;}
+    .recap-cell .l {color:var(--muted);font-size:10px;margin-top:3px;}
+    .meaning-list {display:flex;flex-direction:column;gap:15px;margin-top:12px;}
+    .meaning-item {display:flex;align-items:flex-start;gap:12px;}
+    .info-icon {display:grid;place-items:center;flex:none;width:34px;height:34px;border-radius:11px;background:#f0e9ff;color:#7654d4;}
+    .meaning-item h4 {margin:0 0 3px;font-size:12px;font-weight:800;}
+    .meaning-item p {margin:0;color:var(--muted);font-size:11px;line-height:1.6;}
+    details.tech {margin-top:16px;padding:13px 20px;color:var(--muted);font-size:12px;border-radius:16px;border:1px solid var(--border);background:#fff;}
+    details.tech summary {cursor:pointer;font-weight:800;}
+    #status {font-size:11px;margin-top:10px;}
+    #output {display:block;width:100%;height:180px;margin-top:10px;padding:13px 14px;border:none;border-radius:12px;resize:vertical;background:#151831;color:#dad8f6;font:11px/1.5 "JetBrains Mono",ui-monospace,monospace;}
 
-        .privacy-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-        @media (max-width: 900px) { .privacy-list { grid-template-columns: 1fr; } }
-        .privacy-item { text-align: center; padding: 6px 10px; }
-        .privacy-item .info-icon { width: 46px; height: 46px; border-radius: 14px; margin: 0 auto 10px; display: grid; place-items: center; background: var(--accent-soft); color: var(--accent); }
-        .privacy-item h4 { margin: 0 0 4px; font-size: 13px; font-weight: 700; }
-        .privacy-item p { margin: 0; font-size: 12px; color: var(--muted); line-height: 1.5; }
+    @media (max-width:1250px) {
+      .topbar {flex-wrap:wrap;gap:12px;}
+      .top-right {margin:0;align-self:auto;}
+      .hero-globe {left:auto;right:4%;}
+      .columns {grid-template-columns:minmax(0,1fr) minmax(315px,.83fr);gap:16px;}
+      .skill-row {grid-template-columns:43px minmax(95px,.9fr) minmax(130px,1fr) 59px;gap:9px;}
+      .skill-icon {width:42px;height:42px;border-radius:12px;}
+      .skill-num {width:59px;}
+    }
+    @media (max-width:1000px) {
+      .columns {grid-template-columns: minmax(0,1fr);}
+      .right-stack {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start;}
+      .progress-card {grid-column:1/-1;}
+      .skill-row {grid-template-columns:49px minmax(140px,.9fr) minmax(140px,1.3fr) 66px;gap:14px;}
+    }
+    @media (max-width:720px) {
+      .app {display:block;padding-top:66px;}
+      .sidebar,.sidebar.expanded {position:fixed;top:0;left:0;width:100%;min-width:0;height:66px;padding:7px 14px;overflow:visible;flex-direction:row;align-items:center;background:#171d3d;}
+      .sidebar-toggle,.sidebar.expanded .sidebar-toggle {position:absolute;left:13px;top:8px;margin:0;width:48px;height:48px;}
+      .brand,.sidebar.expanded .brand {position:absolute;left:74px;top:12px;margin:0;padding:0;justify-content:flex-start;}
+      .brand-mark {width:40px;height:40px;}
+      .brand-copy,.sidebar.expanded .brand-copy {display:block;}
+      .sidebar .nav {display:none;position:absolute;top:66px;left:0;width:min(310px,89vw);padding:16px;background:#171d3d;border-radius:0 0 17px 0;box-shadow:8px 15px 25px rgba(12,12,31,.2);}
+      .sidebar.expanded .nav {display:flex;}
+      .sidebar.expanded .nav-item {justify-content:flex-start;}
+      .sidebar.expanded .nav-copy {display:block;}
+      .sidebar-spacer,.sidebar-deco,.sidebar-footer,.sidebar.expanded .sidebar-footer {display:none;}
+      .main {padding:0 15px 32px;}
+      .topbar {min-height:auto;padding:29px 0 23px;}
+      .topbar h1 {font-size:29px;letter-spacing:-1px;}
+      .topbar p {font-size:12px;}
+      .eyebrow {margin-bottom:13px;}
+      .hero-globe {width:180px;height:116px;right:0;top:4px;opacity:.24;}
+      .top-right {gap:8px;}
+      .pill {min-height:39px;padding:7px 10px;font-size:11px;}
+      .secure-pill small {font-size:9px;}
+      .right-stack {display:flex;}
+      .card-pad {padding:20px;}
+      .skill-row {grid-template-columns:42px minmax(0,1fr) 60px;gap:10px;padding:17px 0;}
+      .skill-meta {grid-column:2;}
+      .skill-slider-row {grid-column:2 / 4;grid-row:2;}
+      .skill-num {grid-column:3;grid-row:1;width:60px;}
+      .skill-icon {grid-row:1;}
+      .skill-desc {max-width:none;}
+      .skill-goal-row {padding:14px 20px;}
+      .save-card .card-pad {display:flex;flex-direction:column;align-items:stretch;}
+      .save-actions {width:100%;}
+      .recap-grid {grid-template-columns:repeat(2,minmax(0,1fr));}
+    }
+    @media (prefers-reduced-motion:reduce) {*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important;}}
 
-        .cta-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; padding: 4px 4px 0; }
-        .cta-row p { margin: 0; font-size: 13px; color: var(--muted); }
-        .cta-btn {
-            display: inline-flex; align-items: center; gap: 8px; text-decoration: none;
-            background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #fff;
-            font-weight: 700; font-size: 13.5px; padding: 11px 20px; border-radius: 12px;
-        }
-    </style>
+
+    /* =============================================================
+       RAMC — MATCHING DASHBOARD (paleta de referencia)
+       Ajustes estrictamente visuales; no modifica el protocolo MPC.
+       ============================================================= */
+    :root {
+      --bg:#f4f5ff;
+      --surface:#fff;
+      --surface-2:#f6f6ff;
+      --ink:#0b1539;
+      --muted:#566387;
+      --border:#dce0fa;
+      --purple:#633cff;
+      --purple-dark:#552cdb;
+      --purple-light:#a275ff;
+      --purple-soft:#ece8ff;
+      --teal:#008875;
+      --teal-soft:#e4f9f4;
+      --sidebar:#111b3b;
+      --shadow: 0 12px 26px rgba(86,80,186,.085), 0 3px 10px rgba(103,97,176,.025);
+      --radius:24px;
+    }
+    body {
+      background:
+        radial-gradient(ellipse 39% 26% at 61% 1%,rgba(135,131,246,.28),transparent 79%),
+        radial-gradient(ellipse 29% 34% at 97% 7%,rgba(194,201,251,.62),transparent 82%),
+        linear-gradient(135deg,#fafaff 0%,#f5f5ff 43%,#ebecff 100%);
+      color:var(--ink);font-size:14px;
+    }
+    .app {min-height:100vh;}
+
+    /* Barra de navegación oscura y botones compactos */
+    .sidebar {
+      width:88px;min-width:88px;
+      background:linear-gradient(180deg,#111a39 0%,#0e1837 52%,#141d40 100%);
+      padding:18px 15px 20px;
+      border-right:1px solid rgba(255,255,255,.075);
+    }
+    .sidebar.expanded {width:248px;min-width:248px;}
+    .sidebar-toggle {
+      width:56px;height:55px;margin:0 auto 21px;border-radius:17px;
+      background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.06);
+      color:#fff;
+    }
+    .sidebar-toggle:hover {background:#20294e;}
+    .brand {margin-bottom:23px;}
+    .brand-mark {
+      width:56px;height:54px;border-radius:14px;
+      background:linear-gradient(140deg,#6d53fa 0%,#4164d6 44%,#19b6b1 100%);
+      box-shadow:0 8px 20px rgba(19,20,62,.22);
+    }
+    .brand-mark svg{width:25px;height:25px;}
+    .nav{gap:12px;}
+    .nav-item{min-height:56px;padding:12px;border-radius:14px;color:#ecedff;}
+    .nav-item.active {background:linear-gradient(135deg,#6358fb,#5d41f3);box-shadow:0 7px 18px rgba(44,38,143,.26);}
+    .nav-item:not(.active):hover{background:#252d50;}
+    .nav-icon {width:24px;height:24px;}
+    .sidebar-deco{opacity:0;}
+    .sidebar.expanded .sidebar-deco{opacity:.55;}
+
+    /* Cabecera con iluminación lavanda, globo y dos píldoras */
+    .main {padding:0 clamp(21px,1.65vw,31px) 64px;max-width:1800px;}
+    .main::before {
+      height:270px;
+      background:
+        radial-gradient(ellipse 37% 82% at 55% 6%,rgba(141,142,251,.32),transparent 78%),
+        radial-gradient(ellipse 39% 76% at 99% 0%,rgba(207,215,255,.68),transparent 80%),
+        linear-gradient(180deg,rgba(248,249,255,.45),rgba(247,248,255,0));
+    }
+    .main::after {
+      content:"";pointer-events:none;position:absolute;z-index:-1;
+      top:136px;right:0;width:53%;height:96px;
+      opacity:.5;border-radius:60% 0 0 0 / 78% 0 0 0;
+      background:linear-gradient(105deg,rgba(153,162,252,0),rgba(176,187,252,.26) 52%,rgba(255,255,255,0));
+      transform:skewY(-4deg);
+    }
+    .topbar {min-height:223px;align-items:flex-start;padding:36px 0 33px;gap:15px;}
+    .intro {padding-top:0;max-width:720px;flex:1 1 610px;}
+    .eyebrow {
+      margin-bottom:21px;padding:8px 15px;
+      color:#5711ae;border-color:#e4dbff;background:rgba(237,229,255,.78);
+      font-size:12px;font-weight:800;letter-spacing:-.15px;
+      box-shadow:inset 0 -2px 0 rgba(91,50,204,.025);
+    }
+    .eyebrow svg{width:18px;height:18px;}
+    .topbar h1 {
+      font:800 clamp(33px,3.2vw,45px)/1.13 Manrope,sans-serif;
+      margin:0 0 10px;letter-spacing:-2.05px;color:#0b1536;
+      white-space:nowrap;
+    }
+    .topbar h1 .highlight {
+      background:linear-gradient(100deg,#b475ff 5%,#804cea 47%,#5831c9 100%);
+      -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+    }
+    .topbar p{font-size:15px;line-height:1.55;font-weight:500;color:#59678e;max-width:720px;}
+    .top-right{margin:8px 0 0 auto;align-self:flex-start;gap:13px;flex:none;}
+    .pill {
+      min-height:52px;padding:9px 18px;border-radius:999px;
+      background:rgba(255,255,255,.87);
+      border:1px solid #d7dcfb;
+      box-shadow:0 8px 19px rgba(82,79,173,.13);
+      font-size:12px;color:#101735;
+    }
+    .pill .my-flag{font-size:19px;color:#8868eb;}
+    .country-select{width:110px;max-width:170px;color:#0c1535;font-size:12px;font-weight:800;}
+    #my-seat-label{color:#0b1539;font-weight:800;}
+    .select-chevron{width:15px;stroke:#0b1539;opacity:1;}
+    .secure-pill{color:#008467;background:rgba(230,250,245,.93);border-color:#d7edea;padding:8px 17px;}
+    .secure-pill svg{width:21px;height:21px;}
+    .secure-pill small{font-size:10px;color:#526888;margin-top:3px;}
+    .secure-pill.is-offline{color:#8a536a;background:#faf2f5;border-color:#efdce6;}
+    .hero-globe{width:350px;height:205px;top:0;left:44%;opacity:.75;filter:drop-shadow(0 0 23px rgba(130,136,244,.23));}
+
+    /* Paneles blanco translúcido con bordes lavanda */
+    .columns {grid-template-columns:minmax(0,1.48fr) minmax(355px,1fr);gap:20px;}
+    .left-stack,.right-stack{gap:19px;}
+    .card{
+      border:1px solid rgba(217,222,252,.98);
+      background:rgba(255,255,255,.83);
+      border-radius:24px;
+      box-shadow:var(--shadow);backdrop-filter:blur(18px);
+    }
+    .card-pad{padding:28px 34px 30px;}
+    .card-heading{margin-bottom:7px;gap:12px;}
+    .card-title{font:800 20px/1.36 Manrope,sans-serif;letter-spacing:-.55px;gap:17px;color:#0b1539;}
+    .step-num{
+      width:39px;height:39px;border-radius:50%;
+      background:linear-gradient(145deg,#6e53ff,#5029e5);
+      box-shadow:0 6px 13px rgba(91,56,241,.17);font-size:17px;
+    }
+    .ideal-badge{
+      color:#4f18c1;background:#f2eeff;border:1px solid #d6c9ff;
+      font-weight:800;font-size:13px;padding:8px 14px;
+    }
+    .ideal-badge svg{width:20px;height:20px;}
+    .card-sub{font-size:12px;color:#47577c;margin:0 0 17px;line-height:1.6;}
+
+    /* Formulario: íconos pasteles, números, y barra violeta */
+    .skill-row {
+      grid-template-columns:60px minmax(170px,1fr) minmax(175px,1.32fr) 78px;
+      gap:18px;padding:23px 0;min-height:117px;
+      border-bottom:1px solid #e9ebf8;
+    }
+    .skill-icon{width:60px;height:60px;border-radius:17px;background:var(--skill-soft);color:var(--skill-color);}
+    .skill-icon svg{width:28px;height:28px;stroke-width:2.2;}
+    .skill-name{font:800 14px/1.32 Manrope,sans-serif;letter-spacing:-.13px;}
+    .skill-desc{font-size:12px;line-height:1.42;color:#4b5a80;max-width:235px;margin-top:4px;}
+    .skill-slider-row input[type="range"]{
+      height:10px;margin:13px 0 9px;
+      background:linear-gradient(to right,#633cff 0%,#633cff var(--progress,50%),#d5d7e5 var(--progress,50%),#d5d7e5 100%);
+    }
+    .skill-slider-row input[type="range"]::-webkit-slider-thumb{
+      width:24px;height:24px;border-radius:50%;border:3px solid #6742ff;
+      box-shadow:0 2px 7px rgba(92,53,238,.2);background:#fff;
+    }
+    .skill-slider-row input[type="range"]::-moz-range-thumb{
+      width:19px;height:19px;border:3px solid #6742ff;background:#fff;
+    }
+    .slider-ruler{font-size:12px;color:#526086;font-weight:500;}
+    .slider-ruler .ideal{font-weight:800;color:#6037ed;}
+    .skill-num{
+      width:78px;height:45px;background:rgba(250,251,255,.95);
+      border:1px solid #cfd5f1;box-shadow:0 2px 5px rgba(79,78,148,.075);
+      border-radius:12px;font-size:16px;font-weight:800;color:#0f152d;
+    }
+    .skill-goal-row{background:linear-gradient(90deg,#f9f7ff,#f2efff);color:#69658d;}
+    .skill-goal-row b{color:#6439e5;}
+    .save-card{background:rgba(255,255,255,.88);}
+    .save-card .card-pad{grid-template-columns:minmax(0,1fr) minmax(180px,220px);}
+    .save-card .card-title{font-size:16px;}
+    button.primary{background:linear-gradient(100deg,#754df9,#5d35e9);font-weight:800;font-size:12px;}
+    button.primary.is-ready{background:#f0eaff;border:1px solid #d9c9ff;color:#6031d2;}
+
+    /* Identidad, cantidad y conectados */
+    .session-card{padding:27px 26px;min-height:129px;}
+    .session-grid{grid-template-columns:minmax(0,1.03fr) minmax(0,.97fr);gap:19px;}
+    .session-country{gap:13px;}
+    .session-icon{width:51px;height:51px;background:transparent;color:#8962ef;}
+    .my-country-flag{font-size:35px;line-height:1;color:#8b68ed;}
+    .session-label{font-size:12px;color:#536087;line-height:1.2;margin-bottom:4px;}
+    .session-name{font:800 20px/1.24 Manrope,sans-serif;color:#0d1637;letter-spacing:-.55px;}
+    .session-count{border-left:1px solid #d4d5f6;padding-left:28px;}
+    .session-count .count-num{font-size:19px;white-space:nowrap;}
+    .session-count .count-num small{font-size:12px;font-weight:700;color:#192240;}
+    .count-track{gap:6px;margin-top:12px;}
+    .count-track span{height:9px;background:#d7d9e9;border-radius:20px;}
+    .count-track span.connected{background:linear-gradient(90deg,#7356f4,#a48cf9);}
+    .seats-mini{margin-top:6px;gap:5px;}
+    .seat-chip{font-size:9px;padding:4px 7px;}
+
+    /* "Cómo funciona" sobre fondo blanco, como la imagen */
+    .privacy-card{
+      border:1px solid rgba(217,222,252,.98);
+      color:#101b3d;
+      background:rgba(255,255,255,.80);
+    }
+    .privacy-card::before,.privacy-card::after{display:none;}
+    .privacy-body{padding:24px 24px;grid-template-columns:minmax(0,1fr) 115px;gap:9px;min-height:192px;}
+    .privacy-card h3{color:#0b1539;font:800 19px/1.32 Manrope,sans-serif;margin:0 0 19px;letter-spacing:-.55px;}
+    .privacy-title{display:flex;align-items:center;gap:13px;}
+    .privacy-title-icon{width:33px;height:35px;display:grid;place-items:center;flex:none;color:#fff;}
+    .privacy-title-icon svg{width:33px;height:35px;}
+    .privacy-points{gap:15px;}
+    .privacy-point{gap:12px;font-size:12px;line-height:1.45;color:#192647;align-items:flex-start;}
+    .privacy-point strong{font-weight:800;color:#0a1735;}
+    .privacy-tick{width:28px;height:28px;flex:none;margin:0;border-radius:50%;background:#e6dfff;color:#5c37f5;font-weight:900;font-size:17px;}
+    .privacy-graphic{color:#7150fc;opacity:1;}
+    .privacy-graphic svg{width:112px;height:128px;}
+
+    /* Stepper "¿Qué sigue?" */
+    .progress-card .card-pad{padding:24px 26px 25px;}
+    .progress-card .card-title{font-size:20px;gap:13px;margin:0 0 15px;}
+    .rocket-head{font-size:29px;line-height:1;filter:drop-shadow(0 2px 3px rgba(82,55,206,.12));}
+    .stepper{padding-left:15px;}
+    .s-item{padding:5px 0 9px;gap:16px;min-height:69px;}
+    .s-item:not(:last-child)::before{top:42px;bottom:-12px;left:20px;width:2px;background:#cbd0eb;}
+    .s-dot{width:42px;height:42px;border:0;background:#dee0ee;color:#182245;font:800 17px Manrope,sans-serif;}
+    .s-item.done .s-dot{background:#189c88;}
+    .s-item.active .s-dot{border:0;background:linear-gradient(135deg,#6945ff,#5429e6);box-shadow:0 5px 13px rgba(85,51,223,.15);}
+    .s-text{padding:9px 0 0;}
+    .s-text b{font-size:12px;font-weight:800;color:#0c173a;line-height:1.35;}
+    .s-text span{font-size:12px;color:#53618b;margin-top:2px;}
+    .s-item.active .s-text{background:#ece9ff;padding:10px 17px;margin:0;border-radius:17px;}
+
+    /* Pantalla final: mantiene el mismo sistema de diseño */
+    .relation-board{background:radial-gradient(circle at 50% 46%,rgba(145,122,251,.13),transparent 57%),linear-gradient(135deg,#fcfcff,#f1f1ff);border-color:#dfe1fb;}
+    .relation-node.me .bubble{border-color:#6841fa;}
+    .relation-node.match .bubble{border-color:#12a08d;}
+    .result-headline .value.ok,.recap-cell .v{color:#6436e5;}
+    .recap-cell{background:#f1eeff;border-color:#dfd9fb;}
+    .info-icon{background:#efebff;color:#643bdf;}
+    .result-privacy-copy{color:#536084!important;}
+    details.tech{border-color:#dfe2fb;background:rgba(255,255,255,.85);}
+
+    @media(max-width:1370px){
+      .columns{grid-template-columns:minmax(0,1.5fr) minmax(325px,.95fr);gap:16px;}
+      .topbar{flex-wrap:wrap;gap:10px;}
+      .top-right{margin:0 0 0 auto;}
+      .skill-row{grid-template-columns:52px minmax(132px,1fr) minmax(140px,1.25fr) 68px;gap:12px;}
+      .skill-icon{width:51px;height:51px;}
+      .skill-num{width:68px;}
+      .privacy-body{grid-template-columns:minmax(0,1fr) 80px;}
+      .privacy-graphic svg{width:85px;}
+      .card-pad{padding:26px 28px;}
+    }
+    @media(max-width:1040px){
+      .columns{grid-template-columns:minmax(0,1fr);}
+      .right-stack{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start;}
+      .progress-card{grid-column:1/-1;}
+      .topbar h1{white-space:normal;}
+      .top-right{margin:0;}
+      .hero-globe{left:auto;right:5%;opacity:.37;}
+      .skill-row{grid-template-columns:60px minmax(170px,1fr) minmax(200px,1.3fr) 78px;gap:16px;}
+      .skill-icon{width:60px;height:60px;}
+      .skill-num{width:78px;}
+    }
+    @media(max-width:720px){
+      .app{padding-top:66px;}
+      .sidebar,.sidebar.expanded{width:100%;min-width:0;height:66px;padding:7px 14px;background:#111b3b;}
+      .sidebar-toggle,.sidebar.expanded .sidebar-toggle{top:7px;left:12px;width:49px;height:50px;}
+      .brand,.sidebar.expanded .brand{top:12px;left:72px;}
+      .brand-mark{width:42px;height:42px;}
+      .sidebar .nav{background:#111b3b;}
+      .main{padding:0 14px 34px;}
+      .topbar{min-height:0;padding:26px 0 22px;}
+      .topbar h1{font-size:29px;letter-spacing:-1.1px;white-space:normal;}
+      .topbar p{font-size:12px;}
+      .eyebrow{font-size:10px;margin-bottom:14px;}
+      .hero-globe{width:200px;height:118px;right:0;top:4px;opacity:.22;}
+      .top-right{margin:12px 0 0;gap:7px;}
+      .pill{min-height:42px;padding:7px 11px;font-size:11px;}
+      .secure-pill small{font-size:9px;}
+      .right-stack{display:flex;}
+      .card-pad{padding:21px;}
+      .card-title{font-size:16px;gap:9px;}
+      .step-num{width:33px;height:33px;font-size:13px;}
+      .card-sub{font-size:11px;}
+      .ideal-badge{font-size:11px;}
+      .skill-row{grid-template-columns:48px minmax(0,1fr) 67px;gap:11px;min-height:0;padding:18px 0;}
+      .skill-icon{width:48px;height:48px;border-radius:12px;grid-row:1;}
+      .skill-icon svg{width:23px;height:23px;}
+      .skill-meta{grid-column:2;}
+      .skill-slider-row{grid-column:2/4;grid-row:2;}
+      .skill-num{grid-column:3;grid-row:1;width:67px;}
+      .skill-desc{max-width:none;}
+      .session-card{padding:23px 20px;}
+      .session-count{padding-left:16px;}
+      .session-name{font-size:16px;}
+      .privacy-body{padding:21px;grid-template-columns:minmax(0,1fr) 65px;min-height:0;}
+      .privacy-card h3{font-size:16px;}
+      .privacy-graphic svg{width:65px;}
+      .privacy-point{font-size:11px;}
+      .progress-card .card-title{font-size:17px;}
+      .recap-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
+    }
+
+    /* Ajuste final de escala y espaciado a la maqueta recibida */
+    @media (min-width:1041px) {
+      .intro { padding-left:24px; }
+      .card-title {font-size:22px;gap:21px;}
+      .card-sub {font-size:14px;}
+      .skill-row {padding-top:26px;padding-bottom:26px;min-height:122px;}
+      .skill-icon {transform:translateX(9px);}
+      .skill-meta {transform:translateX(12px);}
+      .skill-name{font-size:16px;}
+      .skill-desc{font-size:14px;line-height:1.45;}
+      .skill-slider-row .slider-wrap{width:calc(100% - 18px);}
+      .skill-num{margin-left:4px;}
+      .session-label{font-size:13px;}
+      .privacy-card h3{font-size:21px;}
+      .privacy-point{font-size:13px;}
+      .privacy-body{min-height:194px;}
+      .progress-card .card-title{font-size:21px;}
+      .s-text b{font-size:14px;}
+      .s-text span{font-size:13px;}
+      .s-item{min-height:70px;}
+    }
+    @media (max-width:1040px) and (min-width:721px){
+      .card-title{font-size:20px;}
+      .skill-name{font-size:15px;}
+      .skill-desc{font-size:13px;}
+      .privacy-point{font-size:12px;}
+    }
+
+    /* Ícono de participantes a la derecha, idéntico al esquema visual */
+    .session-grid{grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);}
+    .session-count{padding-left:23px;}
+    .participant-heading{display:flex;align-items:center;gap:13px;}
+    .people-icon{flex:none;display:grid;place-items:center;width:43px;height:43px;border-radius:50%;color:#364882;background:rgba(255,255,255,.90);}
+    .participant-heading .session-label{margin-bottom:4px;}
+    .session-count .count-track{margin-top:12px;}
+    @media (max-width:1250px){.session-grid{grid-template-columns:1fr 1fr;}.people-icon{width:32px;height:32px;}.people-icon svg{width:21px;height:21px;}.session-count{padding-left:14px;}.participant-heading{gap:7px;}}
+    @media (max-width:720px){.session-count{padding-left:10px;}.people-icon{width:28px;height:28px;}.people-icon svg{width:17px;height:17px;}.participant-heading{gap:4px;}.session-label{font-size:10px;}.session-count .count-num{font-size:16px;}.session-count .count-num small{font-size:9px;}}
+    @media(max-width:720px){.top-right{width:100%;}.pill{padding-left:8px;padding-right:8px;}}
+
+
+    /* ============================================================
+       CÓMO FUNCIONA · MISMO DASHBOARD, SIN SEGUNDA SIDEBAR
+       ============================================================ */
+    .how-view{padding-bottom:24px;}
+    .how-lead{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin:3px 0 20px;}
+    .how-lead p{margin:0;color:#4f5c83;font-size:13px;line-height:1.65;max-width:820px;}
+    .how-mini-badge{display:inline-flex;gap:7px;align-items:center;padding:9px 14px;border:1px solid #d9ceff;border-radius:100px;background:#f1ecff;color:#562bd7;font-weight:800;font-size:12px;white-space:nowrap;}
+    .how-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:stretch;gap:19px;margin-bottom:19px;}
+    .how-bottom{display:grid;grid-template-columns:1fr 1.12fr;align-items:stretch;gap:19px;margin-bottom:19px;}
+    .how-card{height:100%;}
+    .how-card .card-pad{height:100%;display:flex;flex-direction:column;padding:29px 28px;}
+    .how-head{display:flex;align-items:flex-start;gap:12px;margin-bottom:12px;}
+    .how-number{display:grid;place-items:center;flex:none;width:39px;height:39px;border-radius:50%;background:linear-gradient(135deg,#6d4aff,#5434df);color:white;font:800 16px Manrope,sans-serif;box-shadow:0 5px 13px rgba(101,64,228,.18);}
+    .how-title{margin:4px 0 0;color:#0b1539;font:800 18px/1.32 Manrope,sans-serif;letter-spacing:-.4px;}
+    .how-copy{font-size:13px;line-height:1.62;color:#536186;margin:0 0 22px;}
+    .how-visual{margin-top:auto;min-width:0;}
+    .how-skill{display:grid;grid-template-columns:65px minmax(0,1fr) 37px;align-items:center;gap:10px;padding:9px 0;}
+    .how-skill-name{color:#1c2650;font-size:11px;font-weight:800;}
+    .how-track{height:9px;border-radius:100px;background:#d9dbee;overflow:hidden;}
+    .how-fill{height:100%;border-radius:100px;background:linear-gradient(90deg,#6743fa,#9479fa);}
+    .how-val{color:#4031ad;text-align:right;font-weight:800;font-size:11px;}
+    .how-note{display:flex;align-items:center;gap:8px;background:#f1efff;border:1px solid #e7e1ff;color:#575486;border-radius:13px;padding:11px 12px;font-size:11px;line-height:1.45;margin-top:13px;}
+    .how-note svg{flex:none;color:#6541ee;}
+    .how-mesh{position:relative;height:196px;min-width:0;background:radial-gradient(ellipse at center,rgba(177,160,250,.19),transparent 63%);}
+    .how-mesh svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;}
+    .how-mesh-node{position:absolute;transform:translate(-50%,-50%);display:grid;place-items:center;width:45px;height:45px;border:2px solid #7454f4;border-radius:50%;background:#fff;color:#5e39de;box-shadow:0 7px 17px rgba(79,68,168,.12);z-index:2;}
+    .how-mesh-node svg{position:static;width:20px;height:20px;}
+    .how-mesh-label{position:absolute;top:calc(100% + 5px);font-size:10px;font-weight:800;color:#657193;}
+    .how-caption{font-size:11px;text-align:center;color:#657193;margin-top:8px;line-height:1.55;}
+    .how-result{display:grid;place-items:center;text-align:center;padding:15px 0 13px;}
+    .how-result .how-flag{display:grid;place-items:center;font-size:35px;width:77px;height:77px;border:2px solid #d6caff;border-radius:23px;background:#f1edff;margin-bottom:12px;box-shadow:0 8px 18px rgba(99,73,176,.08);}
+    .how-result .how-result-title{font:800 18px/1.4 Manrope,sans-serif;color:#351bb9;}
+    .how-result .how-result-sub{font-size:11px;color:#697291;margin-top:6px;line-height:1.4;}
+    .how-soon{display:inline-flex;align-items:center;margin-left:auto;padding:6px 10px;border:1px solid #ded3ff;border-radius:99px;background:#f0ebff;color:#5730d8;font-size:10px;font-weight:800;white-space:nowrap;}
+    .how-alliance{display:flex;align-items:center;justify-content:center;gap:23px;margin:14px 0;}
+    .how-flag-circle{display:grid;place-items:center;width:66px;height:66px;border-radius:22px;background:#f2efff;border:1px solid #e4ddfc;font-size:33px;}
+    .how-alliance-icon{color:#643aff;}
+    .how-privacy{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px;margin-top:auto;}
+    .how-privacy-item{padding:17px 12px;border-radius:17px;background:linear-gradient(145deg,#fbfaff,#f1eeff);border:1px solid #e9e4fd;text-align:center;}
+    .how-privacy-icon{display:grid;place-items:center;width:44px;height:44px;border-radius:15px;background:#e9e2ff;color:#603ce8;margin:0 auto 12px;}
+    .how-privacy-item strong{display:block;font:800 12px/1.4 Manrope,sans-serif;color:#121b41;}
+    .how-privacy-item p{margin:6px 0 0;color:#586588;font-size:10.5px;line-height:1.55;}
+    .how-footer{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:22px 27px;}
+    .how-footer p{margin:0;max-width:650px;color:#4f5b80;font-size:13px;line-height:1.6;}
+    .how-demo-button{display:inline-flex;align-items:center;justify-content:center;gap:9px;min-width:175px;min-height:46px;padding:11px 20px;color:#fff;background:linear-gradient(110deg,#754df9,#5d35e9);border:0;border-radius:13px;box-shadow:0 8px 15px rgba(91,60,216,.17);text-decoration:none;font-size:12px;font-weight:800;}
+    .how-demo-button:hover{filter:brightness(1.05);}
+    @media(max-width:1250px){.how-steps{grid-template-columns:repeat(2,minmax(0,1fr));}.how-steps>.card:last-child{grid-column:1/-1;}.how-bottom{grid-template-columns:1fr;}.how-mesh{max-width:460px;margin:auto;}}
+    @media(max-width:800px){.how-steps{grid-template-columns:1fr;}.how-steps>.card:last-child{grid-column:auto;}.how-bottom{grid-template-columns:1fr;}.how-privacy{grid-template-columns:1fr;}.how-privacy-item{display:grid;grid-template-columns:44px minmax(0,1fr);gap:4px 12px;text-align:left;align-items:center;}.how-privacy-icon{grid-row:span 2;margin:0;}.how-privacy-item p{margin:0;}.how-card .card-pad{padding:23px 21px;}.how-footer{padding:22px 20px;}.how-demo-button{width:100%;}.how-lead{margin-bottom:16px;}}
+
+  </style>
 </head>
 <body>
 <div class="app">
-    <aside class="sidebar">
-        <div class="brand">
-            <div class="brand-mark" aria-hidden="true">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 4 6 4 9s-1.5 6.4-4 9c-2.5-2.6-4-6-4-9s1.5-6.4 4-9z"/></svg>
-            </div>
-            <div><div class="brand-name">Surplus</div><div class="brand-sub">Skills without borders</div></div>
+  <aside class="sidebar" id="surplus-sidebar">
+    <button type="button" class="sidebar-toggle" id="surplus-menu-toggle" aria-label="Abrir menú" aria-expanded="false" aria-controls="surplus-nav" title="Abrir menú">
+      <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h12"/></svg>
+    </button>
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true">
+        <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 4 6 4 9s-1.5 6.4-4 9c-2.5-2.6-4-6-4-9s1.5-6.4 4-9z"/></svg>
+      </div>
+      <div class="brand-copy"><div class="brand-name">Surplus</div><div class="brand-sub">Skills without borders</div></div>
+    </div>
+    <nav class="nav" id="surplus-nav">
+      <a class="nav-item" href="atlas-lobby.html#mi-pais" data-view="country" title="Mi país">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg>
+        <div class="nav-copy"><div class="nav-title">Mi país</div><div class="nav-hint">Mis capacidades y recomendación</div></div>
+      </a>
+      <!-- Mapa global y Red de alianzas ocultos temporalmente. -->
+      <a class="nav-item active" href="#como-funciona" data-view="how" title="Cómo funciona" aria-current="page">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+        <div class="nav-copy"><div class="nav-title">Cómo funciona</div><div class="nav-hint">Tecnología MPC</div></div>
+      </a>
+    </nav>
+    <div class="sidebar-spacer"></div>
+    <div class="sidebar-deco" aria-hidden="true">
+      <svg viewBox="0 0 100 100" fill="none"><circle cx="50" cy="50" r="42" stroke="#8f80d6"/><ellipse cx="50" cy="50" rx="18" ry="42" stroke="#8f80d6"/><path d="M8 50h84" stroke="#8f80d6"/><circle cx="27" cy="32" r="3" fill="#66e7cf"/><circle cx="76" cy="68" r="3" fill="#aa82ef"/></svg>
+    </div>
+    <div class="sidebar-footer">Colaboración inteligente.<br>Información protegida.</div>
+  </aside>
+  <main class="main">
+    <header class="topbar">
+      <div class="hero-globe" aria-hidden="true">
+        <svg viewBox="0 0 380 216" xmlns="http://www.w3.org/2000/svg" fill="none">
+          <defs>
+            <radialGradient id="orbFill" cx="0" cy="0" r="1" gradientTransform="translate(210 95) rotate(105) scale(148)"><stop stop-color="#e1e3ff" stop-opacity=".88"/><stop offset=".7" stop-color="#c1c6ff" stop-opacity=".43"/><stop offset="1" stop-color="#b4c1ff" stop-opacity=".04"/></radialGradient>
+            <linearGradient id="land" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#c8cfff" stop-opacity=".85"/><stop offset="1" stop-color="#9daaf8" stop-opacity=".43"/></linearGradient>
+            <clipPath id="clipOrb"><circle cx="204" cy="116" r="115"/></clipPath>
+            <filter id="dotGlow" x="-150%" y="-150%" width="400%" height="400%"><feGaussianBlur stdDeviation="4"/></filter>
+          </defs>
+          <circle cx="204" cy="116" r="115" fill="url(#orbFill)" stroke="#f8f8ff" stroke-opacity=".4"/>
+          <g clip-path="url(#clipOrb)">
+            <path d="M82 83 97 51l22-17 21-6 10 11-12 12 4 11-21 4-8 18-13 6 2 29-17 15-17-18Z" fill="url(#land)"/>
+            <path d="m125 121 17-9 23 12 4 18-12 13-4 24-20 31-13-4 1-25-13-21 4-18Z" fill="url(#land)"/>
+            <path d="m161 35 35-18 35 8 19-7 39 17 18 20-13 10-24-8-13 11-19-6-13 16-25-5-18-14-21 2-10-15Z" fill="url(#land)"/>
+            <path d="m197 74 29-8 15 16-2 19 20 14-3 36-16 32-22 5-22-31-12-29 1-27Z" fill="url(#land)"/>
+            <path d="m278 137 32-7 20 20-3 25-20 14-28-15-10-20Z" fill="url(#land)"/>
+            <path d="M92 74c63-43 159-50 223 8M80 128c92-74 164-73 246-6M111 179c58-90 115-102 206-88" stroke="#fff" stroke-width="1.1" stroke-dasharray="2.5 3" stroke-opacity=".9"/>
+            <path d="M85 135c25-50 73-83 136-90 40-4 75 18 92 56M140 53c48 12 84 47 101 116" stroke="#fff" stroke-width="1.15" stroke-opacity=".65"/>
+            <ellipse cx="204" cy="116" rx="55" ry="115" stroke="#fff" stroke-opacity=".28"/>
+          </g>
+          <g fill="#fff"><circle cx="91" cy="115" r="7" opacity=".68" filter="url(#dotGlow)"/><circle cx="152" cy="109" r="7" opacity=".8" filter="url(#dotGlow)"/><circle cx="205" cy="44" r="7" opacity=".75" filter="url(#dotGlow)"/><circle cx="294" cy="119" r="7" opacity=".7" filter="url(#dotGlow)"/><circle cx="91" cy="115" r="3.4"/><circle cx="152" cy="109" r="3.5"/><circle cx="205" cy="44" r="3.6"/><circle cx="294" cy="119" r="3.5"/></g>
+        </svg>
+      </div>
+      <div class="intro">
+        <div class="eyebrow"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="m12 2 9 5-9 5-9-5 9-5Zm-9 10 9 5 9-5M3 17l9 5 9-5"/></svg> RAMC · TECNOLOGÍA MPC</div>
+        <h1>¿Cómo <span class="highlight">funciona?</span></h1>
+        <p>Conoce cómo RAMC encuentra aliados mediante un cálculo privado con ATLAS.</p>
+      </div>
+      <div class="top-right">
+        <div class="pill secure-pill">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+          <span>ATLAS + MPC<small>Conoce cómo se protegen las entradas</small></span>
         </div>
-        <nav class="nav">
-            <a class="nav-item" href="atlas-lobby.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg><div><div>Mi país</div><div class="nav-hint">Mis habilidades y recomendación</div></div></a>
-            <div class="nav-item disabled"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 4 6 4 9s-1.5 6.4-4 9c-2.5-2.6-4-6-4-9s1.5-6.4 4-9z"/></svg><div><div>Mapa global</div><div class="nav-hint">Países participantes</div></div><span class="soon">pronto</span></div>
-            <div class="nav-item disabled"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="12" cy="18" r="2.5"/><path d="M8 7.3 10.3 16M16 7.3 13.7 16M8.5 6h7"/></svg><div><div>Red de alianzas</div><div class="nav-hint">Conexiones públicas</div></div><span class="soon">pronto</span></div>
-            <a class="nav-item active" href="atlas-how-it-works.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg><div><div>Cómo funciona</div><div class="nav-hint">Tecnología MPC</div></div></a>
-        </nav>
-        <div class="sidebar-globe" aria-hidden="true">
-            <svg width="110" height="110" viewBox="0 0 110 110" fill="none">
-                <circle cx="55" cy="55" r="46" stroke="#3a3d66" stroke-width="1.4"/>
-                <circle cx="55" cy="55" r="46" stroke="#5b5bd6" stroke-width="1.4" stroke-dasharray="6 10" opacity=".5"/>
-                <ellipse cx="55" cy="55" rx="46" ry="18" stroke="#3a3d66" stroke-width="1"/>
-                <ellipse cx="55" cy="55" rx="20" ry="46" stroke="#3a3d66" stroke-width="1"/>
-                <circle cx="30" cy="40" r="3" fill="#14a38b"/><circle cx="75" cy="32" r="3" fill="#5b5bd6"/>
-                <circle cx="68" cy="75" r="3" fill="#5b5bd6"/><circle cx="35" cy="78" r="3" fill="#14a38b"/>
-            </svg>
-        </div>
-        <div class="sidebar-footer">
-            <div class="tag">Colaboración segura para<br>un mundo más fuerte.</div>
-            <div class="sidebar-mini-list"><span>Privacidad</span><span>Colaboración</span><span>Impacto real</span></div>
-        </div>
-    </aside>
+      </div>
+    </header>
+    <section id="view-how" class="how-view" aria-label="Cómo funciona Surplus">
+      <div class="how-lead">
+        <p>RMAC utiliza cómputo multiparte (MPC) con ATLAS para recomendar aliados a partir de capacidades privadas. Los participantes calculan juntos sin publicar sus vectores de recursos.</p>
+        <span class="how-mini-badge"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg> ATLAS + MPC</span>
+      </div>
 
-    <main class="main">
-        <div class="topbar">
-            <div>
-                <h1>Cómo funciona</h1>
-                <p>Surplus utiliza Cómputo Multiparte (MPC) con ATLAS para encontrar el mejor aliado para cada país, manteniendo todas las capacidades privadas — sin que ningún servidor vea los datos.</p>
-            </div>
-            <div class="pill secure-pill">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
-                <span>Conexión segura<small>Peer-to-peer, sin intermediarios</small></span>
-            </div>
-        </div>
+      <div class="how-steps">
+        <article class="card how-card"><div class="card-pad">
+          <div class="how-head"><span class="how-number">1</span><h2 class="how-title">Cada país ingresa sus capacidades</h2></div>
+          <p class="how-copy">Cada país introduce sus recursos de manera privada. El ideal es <strong>10</strong> por capacidad: menos de 10 indica déficit y más de 10, excedente.</p>
+          <div class="how-visual">
+            <div class="how-skill"><span class="how-skill-name">Defensa</span><div class="how-track"><div class="how-fill" style="width:35%"></div></div><span class="how-val">7/20</span></div>
+            <div class="how-skill"><span class="how-skill-name">Logística</span><div class="how-track"><div class="how-fill" style="width:40%"></div></div><span class="how-val">8/20</span></div>
+            <div class="how-skill"><span class="how-skill-name">Inteligencia</span><div class="how-track"><div class="how-fill" style="width:75%"></div></div><span class="how-val">15/20</span></div>
+            <div class="how-skill"><span class="how-skill-name">Diplomacia</span><div class="how-track"><div class="how-fill" style="width:30%"></div></div><span class="how-val">6/20</span></div>
+            <div class="how-note"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg> Valores de ejemplo. Tus datos no se envían al lobby como valores abiertos.</div>
+          </div>
+        </div></article>
 
-        <div class="steps-grid">
-            <!-- Step 1 -->
-            <div class="card step-card"><div class="card-pad">
-                <div class="step-head"><span class="step-badge">1</span><span class="step-title">Cada país ingresa sus capacidades</span></div>
-                <p class="step-desc">Cada país introduce, de forma privada, sus capacidades en distintas áreas. También se define un valor ideal por capacidad (en este caso, 10).</p>
-                <div class="step-visual">
-                    <div class="mini-skill"><div class="ic" style="background:#5b5bd6"></div><div class="bar-track"><div class="bar-fill" style="width:35%;background:#5b5bd6"></div></div><div class="val">7/20</div></div>
-                    <div class="mini-skill"><div class="ic" style="background:#2563eb"></div><div class="bar-track"><div class="bar-fill" style="width:40%;background:#2563eb"></div></div><div class="val">8/20</div></div>
-                    <div class="mini-skill"><div class="ic" style="background:#14a38b"></div><div class="bar-track"><div class="bar-fill" style="width:45%;background:#14a38b"></div></div><div class="val">9/20</div></div>
-                    <div class="mini-skill"><div class="ic" style="background:#e08a2b"></div><div class="bar-track"><div class="bar-fill" style="width:30%;background:#e08a2b"></div></div><div class="val">6/20</div></div>
-                    <div class="lock-note">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
-                        Ejemplo ilustrativo — solo tú puedes ver estos datos.
-                    </div>
-                </div>
-            </div></div>
+        <article class="card how-card"><div class="card-pad">
+          <div class="how-head"><span class="how-number">2</span><h2 class="how-title">Cálculo privado con MPC</h2></div>
+          <p class="how-copy">ATLAS procesa los recursos mediante un protocolo MPC ejecutado entre los participantes. Los canales WebRTC permiten la comunicación directa.</p>
+          <div class="how-visual">
+            <div class="how-mesh" id="how-mesh" role="img" aria-label="Diagrama conceptual de cuatro participantes conectados entre sí"></div>
+            <p class="how-caption">Conexiones entre participantes · Los recursos completos no se comparten.</p>
+          </div>
+        </div></article>
 
-            <!-- Step 2 -->
-            <div class="card step-card"><div class="card-pad">
-                <div class="step-head"><span class="step-badge">2</span><span class="step-title">Cálculo privado con MPC</span></div>
-                <p class="step-desc">Las capacidades de todos los países se procesan con ATLAS, un protocolo de MPC, directamente entre los navegadores — sin un servidor central que vea los datos.</p>
-                <div class="step-visual">
-                    <div class="mesh" id="mesh"></div>
-                    <div class="mesh-caption">Cada par de países se conecta de forma directa y encriptada (WebRTC).</div>
-                </div>
-            </div></div>
+        <article class="card how-card"><div class="card-pad">
+          <div class="how-head"><span class="how-number">3</span><h2 class="how-title">Recibe tu recomendación</h2></div>
+          <p class="how-copy">El protocolo busca qué país complementa mejor tus déficits y excedentes. Cada participante recibe el identificador de su aliado recomendado.</p>
+          <div class="how-visual">
+            <div class="how-result"><div class="how-flag" aria-hidden="true">🇨🇴</div><div class="how-result-title">Tu mejor aliado: P2</div><div class="how-result-sub">Ejemplo ilustrativo de una recomendación</div></div>
+            <div class="how-note"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg> No se muestran los vectores de capacidades de los demás países.</div>
+          </div>
+        </div></article>
+      </div>
 
-            <!-- Step 3 -->
-            <div class="card step-card"><div class="card-pad">
-                <div class="step-head"><span class="step-badge">3</span><span class="step-title">Cada país recibe su recomendación</span></div>
-                <p class="step-desc">Cada país obtiene, de forma privada, el país que mejor complementa sus capacidades. Solo tú puedes ver tu propia recomendación.</p>
-                <div class="step-visual">
-                    <div class="mini-result">
-                        <div class="flag">🇨🇴</div>
-                        <div class="who">Tu mejor aliado: P2</div>
-                        <div class="note">Este país puede complementar tus capacidades actuales.</div>
-                    </div>
-                    <div class="lock-note">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
-                        No se muestran las capacidades de otros países ni los detalles del cálculo.
-                    </div>
-                </div>
-            </div></div>
-        </div>
-
-        <div class="bottom-grid">
-            <div class="card"><div class="card-pad">
-                <div class="step-head"><span class="step-badge">4</span><span class="step-title">Conexiones públicas (opcionales)</span><span class="soon-tag" style="margin-left:auto">Próximamente</span></div>
-                <p class="step-desc">Si ambos países deciden formar una alianza y <b>ambos</b> autorizan publicarla, la conexión podrá aparecer en una futura sección "Red de alianzas". De lo contrario, la recomendación permanece privada para siempre — nunca se publica sin el consentimiento explícito de los dos países.</p>
-                <div class="handshake-row">
-                    <div class="flag-circle">🇲🇽</div>
-                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M2.5 19c0-3 2.9-5.4 6.5-5.4s6.5 2.4 6.5 5.4"/><circle cx="18" cy="8.5" r="2.4"/><path d="M15.8 13.8c2.6.4 4.7 2.3 4.7 5"/></svg>
-                    <div class="flag-circle">🇨🇴</div>
-                </div>
-                <div class="lock-note" style="justify-content:center">Solo las alianzas confirmadas por ambos países se mostrarían públicamente.</div>
-            </div></div>
-
-            <div class="card"><div class="card-pad">
-                <div class="step-head" style="margin-bottom:12px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg><span class="step-title">Privacidad en cada paso</span></div>
-                <p class="step-desc" style="margin-bottom:14px">Surplus garantiza que las capacidades, excedentes y resultados detallados de todos los países permanecen privados, en todo momento.</p>
-                <div class="privacy-list">
-                    <div class="privacy-item">
-                        <div class="info-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></div>
-                        <h4>Datos encriptados</h4>
-                        <p>Las capacidades se comparten como shares, no como valores reales.</p>
-                    </div>
-                    <div class="privacy-item">
-                        <div class="info-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6z"/><circle cx="12" cy="12" r="3"/><line x1="4" y1="20" x2="20" y2="4"/></svg></div>
-                        <h4>Sin servidor central</h4>
-                        <p>El cómputo ocurre entre los navegadores — nadie en el medio ve tus datos.</p>
-                    </div>
-                    <div class="privacy-item">
-                        <div class="info-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
-                        <h4>Cálculo seguro con ATLAS</h4>
-                        <p>ATLAS permite el cálculo de forma eficiente sin revelar los datos privados.</p>
-                    </div>
-                </div>
-            </div></div>
-        </div>
-
-        <div class="card"><div class="card-pad cta-row">
-            <p>¿Listo para probarlo? Ingresa tus capacidades y encuentra tu mejor aliado, de forma privada.</p>
-            <a class="cta-btn" href="atlas-lobby.html">Probar la demo
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-            </a>
-        </div></div>
-    </main>
+      <div class="how-bottom">
+        <article class="card how-card"><div class="card-pad">
+          <div class="how-head"><span class="how-number">4</span><h2 class="how-title">Conexiones públicas opcionales</h2><span class="how-soon">Próximamente</span></div>
+          <p class="how-copy">En una futura sección, una alianza podría mostrarse públicamente únicamente si <strong>ambos países</strong> aceptan compartirla. La recomendación no equivale a una alianza confirmada.</p>
+          <div class="how-visual">
+            <div class="how-alliance"><span class="how-flag-circle">🇲🇽</span><svg class="how-alliance-icon" width="37" height="37" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h18M16 7l5 5-5 5"/><path d="M8 7c-2 0-4 2-4 5s2 5 4 5"/></svg><span class="how-flag-circle">🇨🇴</span></div>
+            <div class="how-note">Esta función todavía no está disponible en la demo.</div>
+          </div>
+        </div></article>
+        <article class="card how-card"><div class="card-pad">
+          <div class="how-head"><span class="how-number" aria-hidden="true"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></span><h2 class="how-title">Privacidad en cada paso</h2></div>
+          <p class="how-copy">El objetivo es calcular una recomendación útil sin exponer las entradas completas. Como en cualquier protocolo MPC, las garantías dependen del modelo de seguridad y el resultado puede revelar información limitada.</p>
+          <div class="how-privacy">
+            <div class="how-privacy-item"><div class="how-privacy-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></div><strong>Secret sharing</strong><p>Los recursos participan en el cálculo como fragmentos secretos.</p></div>
+            <div class="how-privacy-item"><div class="how-privacy-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="12" r="2"/><circle cx="19" cy="5" r="2"/><circle cx="19" cy="19" r="2"/><path d="M7 11l10-5M7 13l10 5M19 7v10"/></svg></div><strong>Entre pares</strong><p>Los navegadores se comunican mediante canales WebRTC.</p></div>
+            <div class="how-privacy-item"><div class="how-privacy-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg></div><strong>ATLAS (MPC)</strong><p>Calcula la recomendación sin publicar todos los valores privados.</p></div>
+          </div>
+        </div></article>
+      </div>
+      <div class="card how-footer"><p>¿Lista para probarlo? Regresa a <strong>Mi país</strong> para ingresar tus capacidades y encontrar a tu aliado.</p><a href="atlas-lobby.html#mi-pais" class="how-demo-button" data-view="country">Ir a Mi país <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></a></div>
+    </section>
+  </main>
 </div>
-
 <script>
-(function () {
-    // Mesh diagram: 4 nodes, every pair connected directly — matches the
-    // actual WebRTC topology (each party opens a data channel to every
-    // other party), with no central node, unlike a hub-and-spoke diagram.
-    var mesh = document.getElementById('mesh');
-    var positions = [
-        { x: 50, y: 15 }, { x: 85, y: 55 }, { x: 50, y: 88 }, { x: 15, y: 55 }
-    ];
-    var svgNS = 'http://www.w3.org/2000/svg';
-    var svg = document.createElementNS(svgNS, 'svg');
-    svg.setAttribute('width', '100%'); svg.setAttribute('height', '100%');
-    svg.style.position = 'absolute'; svg.style.inset = '0';
-    mesh.style.position = 'relative';
-    for (var i = 0; i < 4; i++) {
-        for (var j = i + 1; j < 4; j++) {
-            var line = document.createElementNS(svgNS, 'line');
-            line.setAttribute('x1', positions[i].x + '%'); line.setAttribute('y1', positions[i].y + '%');
-            line.setAttribute('x2', positions[j].x + '%'); line.setAttribute('y2', positions[j].y + '%');
-            line.setAttribute('stroke', '#c7c9ea'); line.setAttribute('stroke-width', '1.5');
-            svg.appendChild(line);
-        }
-    }
-    mesh.appendChild(svg);
-    var lockPath = '<rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>';
-    positions.forEach(function (p) {
-        var node = document.createElement('div');
-        node.className = 'mesh-node';
-        node.style.left = p.x + '%'; node.style.top = p.y + '%';
-        node.innerHTML = '<div class="bubble"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + lockPath + '</svg></div>';
-        mesh.appendChild(node);
+(function(){
+  'use strict';
+  var sidebar=document.getElementById('surplus-sidebar');
+  var toggle=document.getElementById('surplus-menu-toggle');
+  if(!sidebar||!toggle)return;
+  function setOpen(open){
+    sidebar.classList.toggle('expanded',open);
+    toggle.setAttribute('aria-expanded',String(open));
+    toggle.setAttribute('aria-label',open?'Cerrar menú':'Abrir menú');
+    toggle.title=open?'Cerrar menú':'Abrir menú';
+  }
+  toggle.addEventListener('click',function(){setOpen(!sidebar.classList.contains('expanded'));});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')setOpen(false);});
+  document.addEventListener('click',function(e){if(window.innerWidth<=720&&sidebar.classList.contains('expanded')&&!sidebar.contains(e.target))setOpen(false);});
+
+  // Keep the lobby room query when returning from a direct link to this page.
+  document.querySelectorAll('a[href="atlas-lobby.html#mi-pais"]').forEach(function(a){
+    a.addEventListener('click',function(e){
+      e.preventDefault();
+      var u=new URL('atlas-lobby.html',window.location.href);
+      u.search=window.location.search;
+      u.hash='mi-pais';
+      window.location.assign(u.href);
     });
+  });
+
+  // Illustrative 4-party WebRTC graph (no MPC protocol execution on this informational page).
+  var mesh=document.getElementById('how-mesh');
+  if(!mesh)return;
+  var coords=[{x:50,y:15},{x:83,y:53},{x:50,y:86},{x:17,y:53}];
+  var NS='http://www.w3.org/2000/svg';
+  var svg=document.createElementNS(NS,'svg');
+  svg.setAttribute('viewBox','0 0 300 196');
+  svg.setAttribute('preserveAspectRatio','none');
+  coords.forEach(function(a,i){coords.forEach(function(b,j){if(j<=i)return;
+    var line=document.createElementNS(NS,'line');
+    line.setAttribute('x1',3*a.x);line.setAttribute('y1',1.96*a.y);
+    line.setAttribute('x2',3*b.x);line.setAttribute('y2',1.96*b.y);
+    line.setAttribute('stroke','#bfb7f7');line.setAttribute('stroke-width','1.7');line.setAttribute('stroke-dasharray','5 5');
+    svg.appendChild(line);
+  });});
+  mesh.appendChild(svg);
+  coords.forEach(function(p,i){
+    var el=document.createElement('div');el.className='how-mesh-node';
+    el.style.left=p.x+'%';el.style.top=p.y+'%';
+    el.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg><span class="how-mesh-label">P'+i+'</span>';
+    mesh.appendChild(el);
+  });
 })();
 </script>
 </body>

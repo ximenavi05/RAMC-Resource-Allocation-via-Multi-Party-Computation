@@ -199,7 +199,7 @@ wss.on('connection', function(connection) {
             var room = String(data.room || "default");
             var lobby = lobbies.get(room);
             if (!lobby) {
-               var size = Math.max(1, parseInt(data.size, 10) || 4);
+               var size = Math.max(1, parseInt(data.size, 10) || 5);
                lobby = {
                   size: size,
                   t: data.t != null ? String(data.t) : "1",

@@ -10,6 +10,7 @@
 #include "Tools/time-func.h"
 #include "sockets.h"
 #include "Math/Setup.h"
+#include <boost/asio/ssl/host_name_verification.hpp>
 
 #include <boost/asio.hpp>
 #include <boost/asio/ssl.hpp>
@@ -18,7 +19,8 @@
 #define SSL_DIR "Player-Data/"
 #endif
 
-typedef boost::asio::io_service ssl_service;
+
+typedef boost::asio::io_context ssl_service;
 
 void check_ssl_file(string filename);
 void ssl_error(string side, string other, string server);
@@ -46,7 +48,7 @@ class ssl_socket : public boost::asio::ssl::stream<boost::asio::ip::tcp::socket>
     typedef boost::asio::ssl::stream<boost::asio::ip::tcp::socket> parent;
 
 public:
-    ssl_socket(boost::asio::io_service& io_service,
+    ssl_socket(boost::asio::io_context& io_service,
             boost::asio::ssl::context& ctx, int plaintext_socket, string other,
             string me, bool client) :
             parent(io_service, ctx)
@@ -57,7 +59,7 @@ public:
 #endif
         lowest_layer().assign(boost::asio::ip::tcp::v4(), plaintext_socket);
         set_verify_mode(boost::asio::ssl::verify_peer);
-        set_verify_callback(boost::asio::ssl::rfc2818_verification(other));
+        set_verify_callback(boost::asio::ssl::host_name_verification(other));
         if (client)
             try
             {
